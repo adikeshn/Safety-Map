@@ -8,7 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword} from "firebase/auth";
 import FirebaseInfo from "../FirebaseHandler";
 
 export default class Register extends Component {
@@ -23,6 +23,32 @@ export default class Register extends Component {
       name: ""
     }
   }
+
+  
+  handleRegister = async () => {
+    if (!this.state.email || !this.state.password || !this.state.name)
+        return false
+    
+      await createUserWithEmailAndPassword(FirebaseInfo.auth, this.state.email, this.state.password)
+        .then((userCredential) => {
+          this.setState({
+            passworderrer: true
+          })
+          FirebaseInfo.auth.signOut();
+          this.props.navigation.navigate("Login");
+          const user = userCredential.user;
+        })
+        .catch((error) => {
+          this.setState({
+            passworderrer: true
+          })
+          error.code == "auth/email-already-in-use" ? this.setState({ errorText: "email already in use" }) :
+            error.code == "auth/invalid-email" ? this.setState({ errorText: "invalid email" }) : this.setState({ errorText: error.message });
+        });
+    
+    return true;
+  }
+
 
 
   reset = () => {
@@ -97,7 +123,7 @@ export default class Register extends Component {
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.loginBtn} onPress={() => {
-            this.checkUser();
+            this.handleRegister();
           }}>
             <Text style={styles.loginText}>Sign Up</Text>
           </TouchableOpacity>
@@ -167,7 +193,7 @@ const styles = StyleSheet.create({
     height: 50,
     flex: 1,
     marginLeft: 20,
-    color: 'red'
+    color: '#035DAF'
   },
 
   forgot_button: {

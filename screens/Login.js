@@ -11,6 +11,7 @@ import {
 import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 import FirebaseInfo from "../FirebaseHandler";
 
+
 export default class Login extends Component {
   constructor(props) {
     super(props);
@@ -22,6 +23,29 @@ export default class Login extends Component {
       errorText: "",
       name: ""
     }
+  }
+
+  checkUser = async () => {
+    await signInWithEmailAndPassword(FirebaseInfo.auth, this.state.email, this.state.password)
+      .then((userCreds) => {
+        this.reset();
+      })
+      .catch((error) => {
+        this.setState({ password: "", passworderrer: true })
+        error.code == "auth/network-request-failed" ? this.setState({ errorText: "No Connection" }) :
+          this.setState({
+            errorText: "incorrect credentials"
+          })
+      });
+  }
+
+  moniterAuthState = async () => {
+    await onAuthStateChanged(FirebaseInfo.auth, user => {
+      if (user) {
+        global.user = user.email
+        this.props.navigation.navigate("HomeScreen")
+      }
+    })
   }
 
 
@@ -39,6 +63,7 @@ export default class Login extends Component {
   
 
   render() {
+    this.moniterAuthState()
     return (
       <View style={styles.container}>
         
@@ -157,7 +182,7 @@ const styles = StyleSheet.create({
     height: 50,
     flex: 1,
     marginLeft: 20,
-    color: 'red'
+    color: '#035DAF'
   },
 
   forgot_button: {

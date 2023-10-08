@@ -17,6 +17,7 @@ export default class App extends Component {
         }}>
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Register" component={Register} />
+          <Stack.Screen name="HomeScreen" component={HomeScreen} />
 
 
         </Stack.Navigator>
