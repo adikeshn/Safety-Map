@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, SafeAreaView } from 'react-native';
 import { auth } from '../FirebaseHandler';
 import {
   Image,
@@ -23,7 +23,8 @@ export default class HomeScreen extends Component {
 
   render() {
     return (
-      <View style={styles.login}>
+      <SafeAreaView style={styles.login}>
+
         <View style={styles.container}>
 
           <TouchableOpacity style={styles.loginBtn} onPress={() => {
@@ -33,7 +34,7 @@ export default class HomeScreen extends Component {
           </TouchableOpacity>
           <StatusBar style="auto" />
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 

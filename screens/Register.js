@@ -76,10 +76,12 @@ export default class Register extends Component {
             <Text style={styles.t}>SafeZone</Text>
           </View>
 
+        
 
+        
           <KeyboardAvoidingView
-            keyboardVerticalOffset={30}
-            behavior="padding"
+            keyboardVerticalOffset={10}
+            behavior='padding'
             style={styles.Llogin}
           >
 
@@ -136,7 +138,7 @@ export default class Register extends Component {
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+        </View>
     );
   }
 }
@@ -157,11 +159,11 @@ const styles = StyleSheet.create({
   login: {
     flex: 1,
     backgroundColor: "#74CAEF",
-    justifyContent: 'space-evenly'
+    justifyContent: 'center'
   },
 
   Llogin: {
-    flex: 0.4,
+    flex: 0.35,
     alignItems: 'center',
     justifyContent: 'space-around',
   },
@@ -177,9 +179,10 @@ const styles = StyleSheet.create({
   },
 
   L2Login: {
-    flex: 0.35,
+    flex: 0.4,
     alignItems: 'center',
     justifyContent: 'flex-end',
+    marginBottom: 50
   },
   image: {
     resizeMode: 'contain',
