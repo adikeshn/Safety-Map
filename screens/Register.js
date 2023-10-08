@@ -7,8 +7,9 @@ import {
   Image,
   TextInput,
   TouchableOpacity,
+  KeyboardAvoidingView,
 } from "react-native";
-import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword} from "firebase/auth";
+import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import FirebaseInfo from "../FirebaseHandler";
 
 export default class Register extends Component {
@@ -24,28 +25,28 @@ export default class Register extends Component {
     }
   }
 
-  
+
   handleRegister = async () => {
     if (!this.state.email || !this.state.password || !this.state.name)
-        return false
-    
-      await createUserWithEmailAndPassword(FirebaseInfo.auth, this.state.email, this.state.password)
-        .then((userCredential) => {
-          this.setState({
-            passworderrer: true
-          })
-          FirebaseInfo.auth.signOut();
-          this.props.navigation.navigate("Login");
-          const user = userCredential.user;
+      return false
+
+    await createUserWithEmailAndPassword(FirebaseInfo.auth, this.state.email, this.state.password)
+      .then((userCredential) => {
+        this.setState({
+          passworderrer: true
         })
-        .catch((error) => {
-          this.setState({
-            passworderrer: true
-          })
-          error.code == "auth/email-already-in-use" ? this.setState({ errorText: "email already in use" }) :
-            error.code == "auth/invalid-email" ? this.setState({ errorText: "invalid email" }) : this.setState({ errorText: error.message });
-        });
-    
+        FirebaseInfo.auth.signOut();
+        this.props.navigation.navigate("Login");
+        const user = userCredential.user;
+      })
+      .catch((error) => {
+        this.setState({
+          passworderrer: true
+        })
+        error.code == "auth/email-already-in-use" ? this.setState({ errorText: "email already in use" }) :
+          error.code == "auth/invalid-email" ? this.setState({ errorText: "invalid email" }) : this.setState({ errorText: error.message });
+      });
+
     return true;
   }
 
@@ -62,74 +63,78 @@ export default class Register extends Component {
 
 
 
-  
+
 
   render() {
     return (
       <View style={styles.container}>
-        
+
         <View style={styles.login}>
-            <View style={styles.L2Login}>
+          <View style={styles.L2Login}>
 
             <Image style={styles.image} source={require("../assets/logo.png")} />
             <Text style={styles.t}>SafeZone</Text>
+          </View>
+
+
+          <KeyboardAvoidingView
+            keyboardVerticalOffset={30}
+            behavior="padding"
+            style={styles.Llogin}
+          >
+
+            <View style={styles.inputView}>
+              <TextInput
+                style={styles.TextInput}
+                placeholder="Name"
+                placeholderTextColor="#035DAF"
+                value={this.state.name}
+                onChangeText={(GetName) => { this.setState({ name: GetName }) }}
+              />
             </View>
 
+            <View style={styles.inputView}>
+              <TextInput
+                style={styles.TextInput}
+                placeholder="Email"
+                placeholderTextColor="#035DAF"
+                value={this.state.email}
+                onChangeText={(GetEmail) => { this.setState({ email: GetEmail }) }}
+              />
+            </View>
 
-          <View style={styles.Llogin}>
+            <View style={styles.inputView}>
+              <TextInput
+                style={styles.TextInput}
+                placeholder="Password"
+                placeholderTextColor="#035DAF"
+                secureTextEntry={true}
+                value={this.state.password}
+                onChangeText={(Getpassword) => { this.setState({ password: Getpassword }) }}
+              />
+            </View>
 
-          <View style={styles.inputView}>
-            <TextInput
-              style={styles.TextInput}
-              placeholder="Name"
-              placeholderTextColor="#035DAF"
-              value={this.state.name}
-              onChangeText={(GetName) => { this.setState({ name: GetName }) }}
-            />
+            {
+              this.state.passworderrer ? (
+                <Text style={styles.error}>{this.state.errorText}</Text>
+              ) : null
+            }
+          </KeyboardAvoidingView>
+
+          <View style={styles.buttonWrapper}>
+            <TouchableOpacity onPress={() => {
+              this.reset();
+              this.props.navigation.navigate("Login")
+            }}>
+              <Text style={styles.forgot_button}>Login</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.loginBtn} onPress={() => {
+              this.handleRegister();
+            }}>
+              <Text style={styles.loginText}>Sign Up</Text>
+            </TouchableOpacity>
           </View>
-
-          <View style={styles.inputView}>
-            <TextInput
-              style={styles.TextInput}
-              placeholder="Email"
-              placeholderTextColor="#035DAF"
-              value={this.state.email}
-              onChangeText={(GetEmail) => { this.setState({ email: GetEmail }) }}
-            />
-          </View>
-
-          <View style={styles.inputView}>
-            <TextInput
-              style={styles.TextInput}
-              placeholder="Password"
-              placeholderTextColor="#035DAF"
-              secureTextEntry={true}
-              value={this.state.password}
-              onChangeText={(Getpassword) => { this.setState({ password: Getpassword }) }}
-            />
-          </View>
-
-          {
-            this.state.passworderrer ? (
-              <Text style={styles.error}>{this.state.errorText}</Text>
-            ) : null
-          }
-
-          <TouchableOpacity onPress={() => {
-            this.reset();
-            this.props.navigation.navigate("Login")
-          }}>
-            <Text style={styles.forgot_button}>Login</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.loginBtn} onPress={() => {
-            this.handleRegister();
-          }}>
-            <Text style={styles.loginText}>Sign Up</Text>
-          </TouchableOpacity>
-          </View>
-          
-        
         </View>
       </View>
     );
@@ -138,10 +143,10 @@ export default class Register extends Component {
 
 const styles = StyleSheet.create({
 
-    loginText: {
-        fontSize: 17,
-        fontWeight: 'bold'
-    },  
+  loginText: {
+    fontSize: 17,
+    fontWeight: 'bold'
+  },
   container: {
     flex: 1,
   },
@@ -159,16 +164,17 @@ const styles = StyleSheet.create({
     flex: 0.4,
     alignItems: 'center',
     justifyContent: 'space-around',
-
-
   },
 
-  
+  buttonWrapper: {
+    alignItems: 'center',
+    justifyContent: 'space-around',
+  },
 
-  t:{
+  t: {
     fontSize: 35,
     fontWeight: '600',
-  },  
+  },
 
   L2Login: {
     flex: 0.35,

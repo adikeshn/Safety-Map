@@ -7,6 +7,7 @@ import {
   Image,
   TextInput,
   TouchableOpacity,
+  KeyboardAvoidingView,
 } from "react-native";
 import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 import FirebaseInfo from "../FirebaseHandler";
@@ -60,66 +61,69 @@ export default class Login extends Component {
 
 
 
-  
+
 
   render() {
     this.moniterAuthState()
     return (
       <View style={styles.container}>
-        
+
         <View style={styles.login}>
-            <View style={styles.L2Login}>
+          <View style={styles.L2Login}>
 
             <Image style={styles.image} source={require("../assets/logo.png")} />
             <Text style={styles.t}>SafeZone</Text>
+          </View>
+
+
+          <KeyboardAvoidingView
+            keyboardVerticalOffset={50}
+            behavior="padding"
+            style={styles.Llogin}
+          >
+            <View style={styles.inputView}>
+
+              <TextInput
+                style={styles.TextInput}
+                placeholder="Email"
+                placeholderTextColor="#035DAF"
+                value={this.state.email}
+                onChangeText={(GetEmail) => { this.setState({ email: GetEmail }) }}
+              />
             </View>
 
+            <View style={styles.inputView}>
+              <TextInput
+                style={styles.TextInput}
+                placeholder="Password"
+                placeholderTextColor="#035DAF"
+                secureTextEntry={true}
+                value={this.state.password}
+                onChangeText={(Getpassword) => { this.setState({ password: Getpassword }) }}
+              />
+            </View>
 
-          <View style={styles.Llogin}>
+            {
+              this.state.passworderrer ? (
+                <Text style={styles.error}>{this.state.errorText}</Text>
+              ) : null
+            }
 
-          
-          <View style={styles.inputView}>
-            <TextInput
-              style={styles.TextInput}
-              placeholder="Email"
-              placeholderTextColor="#035DAF"
-              value={this.state.email}
-              onChangeText={(GetEmail) => { this.setState({ email: GetEmail }) }}
-            />
-          </View>
+            <TouchableOpacity onPress={() => {
+              this.reset();
+              this.props.navigation.navigate("Register")
+            }}>
+              <Text style={styles.forgot_button}>Register</Text>
+            </TouchableOpacity>
 
-          <View style={styles.inputView}>
-            <TextInput
-              style={styles.TextInput}
-              placeholder="Password"
-              placeholderTextColor="#035DAF"
-              secureTextEntry={true}
-              value={this.state.password}
-              onChangeText={(Getpassword) => { this.setState({ password: Getpassword }) }}
-            />
-          </View>
+            <TouchableOpacity style={styles.loginBtn} onPress={() => {
+              this.checkUser();
+            }}>
+              <Text style={styles.loginText}>Log In</Text>
+            </TouchableOpacity>
+          </KeyboardAvoidingView>
 
-          {
-            this.state.passworderrer ? (
-              <Text style={styles.error}>{this.state.errorText}</Text>
-            ) : null
-          }
 
-          <TouchableOpacity onPress={() => {
-            this.reset();
-            this.props.navigation.navigate("Register")
-          }}>
-            <Text style={styles.forgot_button}>Register</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.loginBtn} onPress={() => {
-            this.checkUser();
-          }}>
-            <Text style={styles.loginText}>Log In</Text>
-          </TouchableOpacity>
-          </View>
-          
-        
         </View>
       </View>
     );
@@ -130,7 +134,7 @@ const styles = StyleSheet.create({
   loginText: {
     fontSize: 17,
     fontWeight: 'bold'
-},
+  },
   container: {
     flex: 1,
   },
@@ -152,12 +156,12 @@ const styles = StyleSheet.create({
 
   },
 
-  
 
-  t:{
+
+  t: {
     fontSize: 35,
     fontWeight: '600',
-  },  
+  },
 
   L2Login: {
     flex: 0.35,
