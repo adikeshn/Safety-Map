@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TouchableOpacity, View, SafeAreaView, Dimensions } from 'react-native';
+import { 
+    StyleSheet, 
+    Text, 
+    TouchableOpacity, 
+    View, 
+    SafeAreaView, 
+    Dimensions,
+    Image,
+    TextInput,
+} from 'react-native';
+import Swiper from 'react-native-swiper';
 import { auth } from '../FirebaseHandler';
-import {
-  Image,
-  TextInput,
-} from "react-native";
 
 export default class HomeScreen extends Component {
   constructor(props) {
@@ -27,7 +33,11 @@ export default class HomeScreen extends Component {
             <Image style={styles.image} source={require("../assets/logo.png")} />
             <Text style={styles.t2}>SafeZone</Text>
             <Text style={styles.t}>Empowering Voices Promoting Safety</Text>
-
+            <Swiper loop={false} showsButtons={false}>
+                <Text>KYS</Text>
+                <Text>KYS</Text>
+                <Text>KYS</Text>
+            </Swiper>
           </View>
           <View style={styles.buttonContainer}>
             <View style={styles.buttonRow}>
@@ -88,7 +98,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
   },
-
+  scrollView: {
+    backgroundColor: 'pink',
+    marginHorizontal: 20,
+  },
 
   L2Login: {
     flex: 0.35,
