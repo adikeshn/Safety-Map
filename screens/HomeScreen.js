@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import Swiper from 'react-native-swiper';
 import { auth } from '../FirebaseHandler';
-
+import SlideShow from '../components/Slideshow';
 export default class HomeScreen extends Component {
   constructor(props) {
     super(props);
@@ -31,14 +31,19 @@ export default class HomeScreen extends Component {
         <View style={styles.container}>
           <View style={styles.textContainer}>
             <Image style={styles.image} source={require("../assets/logo.png")} />
-            <Text style={styles.t2}>SafeZone</Text>
-            <Text style={styles.t}>Empowering Voices Promoting Safety</Text>
-            <Swiper loop={false} showsButtons={false}>
-                <Text>KYS</Text>
-                <Text>KYS</Text>
-                <Text>KYS</Text>
-            </Swiper>
+            <View style={styles.innerText}>
+              <Text style={styles.t2}>SafeZone</Text>
+              <Text style={styles.t}>Empowering Voices, Promoting Safety</Text>
+            </View>
+            
           </View>
+
+
+          <View style={styles.swiperView}>
+            <SlideShow />
+          </View>
+
+
           <View style={styles.buttonContainer}>
             <View style={styles.buttonRow}>
               <TouchableOpacity style={styles.halfSizeButton} onPress={() => { /* Handle button 1 action */ }}>
@@ -48,13 +53,15 @@ export default class HomeScreen extends Component {
                 <Text style={styles.buttonText}>Report</Text>
               </TouchableOpacity>
             </View>
-
+            <View style={styles.buttonRow}>
+              <TouchableOpacity style={styles.loginBtn} onPress={() => {
+                this.signOut();
+              }}>
+                <Text style={styles.loginText}>Sign Out</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          <TouchableOpacity style={styles.loginBtn} onPress={() => {
-            this.signOut();
-          }}>
-            <Text style={styles.loginText}>Sign Out</Text>
-          </TouchableOpacity>
+
           <StatusBar style="auto" />
         </View>
       </SafeAreaView>
@@ -63,6 +70,14 @@ export default class HomeScreen extends Component {
 }
 
 const styles = StyleSheet.create({
+    swiperView:{
+      flex: 0.75,
+    },  
+  innerText:{
+    marginLeft: 10,
+    marginBottom: 10
+  },  
+  
   loginText: {
     fontSize: 17,
     fontWeight: 'bold'
@@ -71,23 +86,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
-  banner: {
-    backgroundColor: "#096901",
-    flex: 0.1
-  },
+  
   login: {
     flex: 1,
     backgroundColor: "#74CAEF",
     justifyContent: 'space-evenly'
   },
 
-  Llogin: {
-    flex: 0.4,
-    alignItems: 'center',
-    justifyContent: 'center',
-
-
-  },
+  
   t2: {
     fontSize: 35,
     fontWeight: '600',
@@ -103,22 +109,21 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
 
-  L2Login: {
-    flex: 0.35,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-  },
+  
   textContainer: {
     alignItems: 'center',
-    marginTop: 10, // Adjust the top margin to move text closer to the image
+    marginTop: 10,
+    flexDirection: 'row',
+    flex: 0.1, // Adjust the top margin to move text closer to the image
   },
   buttonContainer: {
     alignItems: "center",
+    flex: 0.15,
   },
   buttonRow: {
     flexDirection: "row",
     justifyContent: "center",
-    marginBottom: 15, // Adjust this margin as needed
+    marginBottom: 10, // Adjust this margin as needed
   },
   halfSizeButton: {
     width: "40%", // Half the size of the "Sign Out" button
@@ -129,15 +134,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#08C91C",
     marginHorizontal: 5, // Adjust this spacing as needed
   },
-  halfSizeButtonCentered: {
-    width: "40%", // Half the size of the "Sign Out" button
-    borderRadius: 25,
-    height: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#08C91C",
-    marginBottom: 15, // Adjust this margin as needed
-  },
+  
   button: {
     width: "80%",
     borderRadius: 25,
@@ -167,20 +164,12 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
 
-  TextInput: {
-    height: 50,
-    flex: 1,
-    marginLeft: 20,
-    color: '#035DAF'
-  },
+  
 
-  forgot_button: {
-    height: 30,
-    marginBottom: 15
-  },
+  
 
   loginBtn: {
-    width: "80%",
+    width: '80%',
     borderRadius: 25,
     height: 50,
     alignItems: "center",
@@ -188,10 +177,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#08C91C",
   },
 
-  error: {
-    color: "red",
-    fontWeight: 'bold',
-    marginBottom: 15,
-    fontSize: 15
-  }
+  
 });
