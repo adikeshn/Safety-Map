@@ -20,19 +20,20 @@ export default function SlideShow() {
           <View style={styles.InnerRect}>
             <Text style={styles.MissionText}>The Problem</Text>
             <View style={styles.line}></View>
-            <Text style={styles.descText}>54.4% of all crimes were unreported in America last year!</Text>
+            <Text style={styles.descText}>54.4% of all crimes weren't reported in America last year</Text>
+            <Text style={styles.descText}>Even more experiences are never shared due to them not being crimes</Text>
             <Image style={styles.image} source={require("../assets/WarningSign.png")} />
-            <Text style={styles.descText}>There are no platforms to viably report your unsafe encoutners.</Text>
+            <Text style={styles.descText}>There are no platforms to viably report your unsafe encoutners directly to the community.</Text>
           </View>
         </View>
 
         <View style={styles.slideView}>
           <View style={styles.InnerRect}>
-            <Text style={styles.MissionText}>How the App Works</Text>
+            <Text style={styles.MissionText}>Our Solution</Text>
             <View style={styles.line}></View>
-            <Text style={styles.descText}>Users can report unsafe encounters through our report page.</Text>
+            <Text style={styles.descText}>Users can report unsafe encounters or uncomfortable experiences through our report page.</Text>
             <Image style={styles.image} source={require("../assets/Ai.png")} />
-            <Text style={styles.descText}>Large Language AI models grade the severity of these reports and use it to create AI geographic heat maps.</Text>
+            <Text style={styles.descText}>Large Language AI models grade the severity of these reports and use it to create geographic heat maps for the community to view.</Text>
           </View>
         </View>
       </Swiper>
@@ -50,7 +51,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   InnerRect: {
-    flex: 0.89,
+    flex: 0.93,
     width: '85%',
     backgroundColor: "#00B1D8",
     alignItems: 'center',
@@ -70,9 +71,9 @@ const styles = StyleSheet.create({
     marginTop: 14,
   },
   descText: {
-    fontSize: 20,
+    fontSize: 18,
     color: 'white',
-    width: '70%',
+    width: '80%',
     textAlign: 'center',
     marginTop: 14,
   },
