@@ -26,7 +26,8 @@ export default class HomeScreen extends Component {
           <View style={styles.textContainer}>
             <Image style={styles.image} source={require("../assets/logo.png")} />
             <Text style={styles.t2}>SafeZone</Text>
-            <Text style={styles.t}>Empowering Voices, Heating up Equality</Text>
+            <Text style={styles.t}>Empowering Voices Promoting Safety</Text>
+
           </View>
           <View style={styles.buttonContainer}>
             <View style={styles.buttonRow}>
@@ -37,9 +38,7 @@ export default class HomeScreen extends Component {
                 <Text style={styles.buttonText}>Report</Text>
               </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.halfSizeButtonCentered} onPress={() => { /* Handle button 3 action */ }}>
-              <Text style={styles.buttonText}>About Us</Text>
-            </TouchableOpacity>
+
           </View>
           <TouchableOpacity style={styles.loginBtn} onPress={() => {
             this.signOut();
