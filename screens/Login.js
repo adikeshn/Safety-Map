@@ -38,6 +38,11 @@ export default class Login extends Component {
             errorText: "incorrect credentials"
           })
       });
+      this.moniterAuthState()
+  }
+
+  componentDidMount = () => {
+    this.moniterAuthState()
   }
 
   moniterAuthState = async () => {
@@ -64,7 +69,6 @@ export default class Login extends Component {
 
 
   render() {
-    this.moniterAuthState()
     return (
       <View style={styles.container}>
 
