@@ -54,15 +54,16 @@ export default class HomeScreen extends Component {
                                 style={styles.TextInput}
                                 placeholder="Address: "
                                 placeholderTextColor="#035DAF"
-                                value={this.state.email}
                                 onChangeText={(GetEmail) => { this.setState({ email: GetEmail }) }}
                             />
                         </View>
 
-                        <View style={styles.inputView}>
+                        <View style={styles.inputView2}>
                             <TextInput
                                 style={styles.TextInput}
-                                placeholder="Describe the situation"
+                                multiline={true}
+                                numberOfLines={4}
+                                placeholder="Describe the situation: "
                                 placeholderTextColor="#035DAF"
                                 secureTextEntry={true}
                                 value={this.state.password}
@@ -127,6 +128,7 @@ const styles = StyleSheet.create({
     t: {
         fontSize: 15,
         fontWeight: '600',
+        marginBottom: 12,
     },
     scrollView: {
         backgroundColor: 'pink',
@@ -185,6 +187,13 @@ const styles = StyleSheet.create({
         borderRadius: 9,
         width: "80%",
         height: 45,
+        marginBottom: 25,
+    },
+    inputView2: {
+        backgroundColor: "#2FAED7",
+        borderRadius: 9,
+        width: "80%",
+        height: 125,
         marginBottom: 25,
     },
 
