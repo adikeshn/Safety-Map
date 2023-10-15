@@ -11,17 +11,23 @@ import {
     KeyboardAvoidingView,
     TextInput,
 } from 'react-native';
-import Swiper from 'react-native-swiper';
-import { auth } from '../FirebaseHandler';
-import SlideShow from '../components/Slideshow';
+
+import { collection, addDoc } from 'firebase/firestore';
+import FirebaseInfo from '../FirebaseHandler';
 export default class HomeScreen extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {};
+        this.state = {
+            Address: '',
+            Description: ''
+        };
     }
 
     submit = () => {
+
+        addDoc(collection(FirebaseInfo.db, "SafeZone-Reports"), { Address: this.state.Address, Description: this.state.Description, Email: global.user })    
+
         this.props.navigation.navigate("HomeScreen");
     }
 
@@ -29,9 +35,7 @@ export default class HomeScreen extends Component {
         this.props.navigation.navigate("HomeScreen");
     }
 
-    report = () => {
-        this.props.navigation.navigate("Report");
-    }
+    
 
 
     render() {
@@ -44,7 +48,6 @@ export default class HomeScreen extends Component {
                             <Text style={styles.t2}>Report</Text>
                             <Text style={styles.t}>Reporting builds safer communities</Text>
                         </View>
-
                     </View>
                     <View style={styles.InnerRect}>
                         <KeyboardAvoidingView
@@ -57,7 +60,7 @@ export default class HomeScreen extends Component {
                                         style={styles.TextInput}
                                         placeholder="Address: "
                                         placeholderTextColor="#035DAF"
-                                        onChangeText={(GetEmail) => { this.setState({ email: GetEmail }) }}
+                                        onChangeText={(GetAddress) => { this.setState({ Address: GetAddress }) }}
                                     />
                                 </View>
                                 <View style={styles.inputView2}>
@@ -69,7 +72,7 @@ export default class HomeScreen extends Component {
                                         placeholderTextColor="#035DAF"
                                         secureTextEntry={true}
                                         value={this.state.password}
-                                        onChangeText={(Getpassword) => { this.setState({ password: Getpassword }) }}
+                                        onChangeText={(GetDescription) => { this.setState({ Description: GetDescription }) }}
                                     />
                                 </View>
 
@@ -107,30 +110,29 @@ export default class HomeScreen extends Component {
 }
 
 const styles = StyleSheet.create({
-    swiperView: {
-        flex: 0.75,
-    },
+    container: {
+        flex: 1,
+        alignItems: 'center',
+      },
+   
     innerText: {
         marginLeft: 10,
-        marginBottom: 10
     },
     InnerRect: {
         flex: 0.45,
         width: '85%',
         backgroundColor: "#00B1D8",
         alignItems: 'center',
+        marginTop: 20,
         borderRadius: 10,
-        marginLeft: 30,
+        
         marginBottom: 20,
     },
     loginText: {
         fontSize: 17,
         fontWeight: 'bold'
     },
-    container: {
-        flex: 1,
-        alignItems: 'center',
-    },
+    
 
     login: {
         flex: 1,
@@ -150,16 +152,11 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         marginBottom: 12,
     },
-    scrollView: {
-        backgroundColor: 'pink',
-        marginHorizontal: 20,
-    },
+    
 
     textContainer: {
+        marginTop: 20,
         alignItems: 'center',
-        marginTop: 10,
-        marginLeft: 10,
-        marginBottom: 10,
         flexDirection: 'row',
         flex: 0.1, // Adjust the top margin to move text closer to the image
     },
@@ -172,35 +169,16 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         marginBottom: 10, // Adjust this margin as needed
     },
-    halfSizeButton: {
-        width: "40%", // Half the size of the "Sign Out" button
-        borderRadius: 25,
-        height: 50,
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#08C91C",
-        marginHorizontal: 5, // Adjust this spacing as needed
-    },
+    
 
-    button: {
-        width: "80%",
-        borderRadius: 25,
-        height: 50,
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#08C91C",
-        marginBottom: 15, // Adjust this margin as needed
-    },
-    buttonText: {
-        fontSize: 17,
-        fontWeight: 'bold',
-    },
+    
+    
     image: {
         resizeMode: 'contain',
         marginBottom: 5,  // Reduce the margin to 5 units
         width: Dimensions.get('window').width * 0.4,
         height: Dimensions.get('window').height * 0.2,
-        flex: 0.6,
+        flex: 0.55,
     },
 
     inputView: {
@@ -227,22 +205,10 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         backgroundColor: "#08C91C",
     },
-    loginText: {
-        fontSize: 17,
-        fontWeight: 'bold'
-    },
-    container: {
-        flex: 1,
-    },
-    banner: {
-        backgroundColor: "#096901",
-        flex: 0.1
-    },
-    login: {
-        flex: 1,
-        backgroundColor: "#74CAEF",
-        justifyContent: 'space-evenly'
-    },
+    
+    
+    
+    
 
     Llogin: {
         flex: 0.4,
@@ -254,16 +220,7 @@ const styles = StyleSheet.create({
 
 
 
-    L2Login: {
-        flex: 0.35,
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-    },
-    image: {
-        resizeMode: 'contain',
-        marginBottom: 10,
-        flex: 0.6,
-    },
+   
 
     TextInput: {
         height: 50,
@@ -272,26 +229,10 @@ const styles = StyleSheet.create({
         color: '#035DAF'
     },
 
-    forgot_button: {
-        height: 30,
-        marginBottom: 15
-    },
+    
 
-    loginBtn: {
-        width: "80%",
-        borderRadius: 25,
-        height: 50,
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#08C91C",
-    },
+    
 
-    error: {
-        color: "red",
-        fontWeight: 'bold',
-        marginBottom: 15,
-        fontSize: 15
-    }
-
+    
 
 });
