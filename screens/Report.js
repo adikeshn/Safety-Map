@@ -25,6 +25,10 @@ export default class HomeScreen extends Component {
         this.props.navigation.navigate("HomeScreen");
     }
 
+    cancel = () => {
+        this.props.navigation.navigate("HomeScreen");
+    }
+
     report = () => {
         this.props.navigation.navigate("Report");
     }
@@ -42,47 +46,55 @@ export default class HomeScreen extends Component {
                         </View>
 
                     </View>
+                    <View style={styles.InnerRect}>
+                        <KeyboardAvoidingView
+                            keyboardVerticalOffset={50}
+                            behavior="padding"
+                            style={styles.Llogin}
+                        >
+                                <View style={styles.inputView}>
+                                    <TextInput
+                                        style={styles.TextInput}
+                                        placeholder="Address: "
+                                        placeholderTextColor="#035DAF"
+                                        onChangeText={(GetEmail) => { this.setState({ email: GetEmail }) }}
+                                    />
+                                </View>
+                                <View style={styles.inputView2}>
+                                    <TextInput
+                                        style={styles.TextInput}
+                                        multiline={true}
+                                        numberOfLines={4}
+                                        placeholder="Describe the situation: "
+                                        placeholderTextColor="#035DAF"
+                                        secureTextEntry={true}
+                                        value={this.state.password}
+                                        onChangeText={(Getpassword) => { this.setState({ password: Getpassword }) }}
+                                    />
+                                </View>
 
-                    <KeyboardAvoidingView
-                        keyboardVerticalOffset={50}
-                        behavior="padding"
-                        style={styles.Llogin}
-                    >
-                        <View style={styles.inputView}>
-
-                            <TextInput
-                                style={styles.TextInput}
-                                placeholder="Address: "
-                                placeholderTextColor="#035DAF"
-                                onChangeText={(GetEmail) => { this.setState({ email: GetEmail }) }}
-                            />
-                        </View>
-
-                        <View style={styles.inputView2}>
-                            <TextInput
-                                style={styles.TextInput}
-                                multiline={true}
-                                numberOfLines={4}
-                                placeholder="Describe the situation: "
-                                placeholderTextColor="#035DAF"
-                                secureTextEntry={true}
-                                value={this.state.password}
-                                onChangeText={(Getpassword) => { this.setState({ password: Getpassword }) }}
-                            />
-                        </View>
-
-                        {
-                            this.state.passworderrer ? (
-                                <Text style={styles.error}>{this.state.errorText}</Text>
-                            ) : null
-                        }
-                    </KeyboardAvoidingView>
-                    <View style={styles.buttonContainer}>
+                                {
+                                    this.state.passworderrer ? (
+                                        <Text style={styles.error}>{this.state.errorText}</Text>
+                                    ) : null
+                                }
+                        </KeyboardAvoidingView>
+                    </View>
+                        <View style={styles.buttonContainer}>
+                    
                         <View style={styles.buttonRow}>
                             <TouchableOpacity style={styles.loginBtn} onPress={() => {
                                 this.submit();
                             }}>
                                 <Text style={styles.loginText}>Submit</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.buttonRow}>
+                            <TouchableOpacity style={styles.loginBtn} onPress={() => {
+                                this.cancel();
+                            }}>
+                                <Text style={styles.loginText}>Cancel</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -102,7 +114,15 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         marginBottom: 10
     },
-
+    InnerRect: {
+        flex: 0.45,
+        width: '85%',
+        backgroundColor: "#00B1D8",
+        alignItems: 'center',
+        borderRadius: 10,
+        marginLeft: 30,
+        marginBottom: 20,
+    },
     loginText: {
         fontSize: 17,
         fontWeight: 'bold'
@@ -135,10 +155,11 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
     },
 
-
     textContainer: {
         alignItems: 'center',
         marginTop: 10,
+        marginLeft: 10,
+        marginBottom: 10,
         flexDirection: 'row',
         flex: 0.1, // Adjust the top margin to move text closer to the image
     },
@@ -183,23 +204,20 @@ const styles = StyleSheet.create({
     },
 
     inputView: {
-        backgroundColor: "#2FAED7",
+        backgroundColor: "#74CAEF",
         borderRadius: 9,
         width: "80%",
         height: 45,
         marginBottom: 25,
     },
+
     inputView2: {
-        backgroundColor: "#2FAED7",
+        backgroundColor: "#74CAEF",
         borderRadius: 9,
         width: "80%",
-        height: 125,
-        marginBottom: 25,
+        height: 175,
+        marginBottom: -160,
     },
-
-
-
-
 
     loginBtn: {
         width: '80%',
@@ -230,8 +248,7 @@ const styles = StyleSheet.create({
         flex: 0.4,
         alignItems: 'center',
         justifyContent: 'center',
-
-
+        width: "90%",
     },
 
 
@@ -246,14 +263,6 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
         marginBottom: 10,
         flex: 0.6,
-    },
-
-    inputView: {
-        backgroundColor: "#2FAED7",
-        borderRadius: 9,
-        width: "80%",
-        height: 45,
-        marginBottom: 25,
     },
 
     TextInput: {
