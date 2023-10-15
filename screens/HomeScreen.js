@@ -29,6 +29,10 @@ export default class HomeScreen extends Component {
     this.props.navigation.navigate("Report");
   }
 
+  heatmap = () => {
+    this.props.navigation.navigate("HeatMap");
+  }
+
 
   render() {
     return (
@@ -51,7 +55,7 @@ export default class HomeScreen extends Component {
 
           <View style={styles.buttonContainer}>
             <View style={styles.buttonRow}>
-              <TouchableOpacity style={styles.halfSizeButton} onPress={() => { /* Handle button 1 action */ }}>
+              <TouchableOpacity style={styles.halfSizeButton} onPress={() => { this.heatmap(); }}>
                 <Text style={styles.buttonText}>Heat Map</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.halfSizeButton} onPress={() => { this.report(); }}>
