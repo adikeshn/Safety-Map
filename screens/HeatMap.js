@@ -14,6 +14,7 @@ import Swiper from 'react-native-swiper';
 import { auth } from '../FirebaseHandler';
 import SlideShow from '../components/Slideshow';
 import MapView, {Heatmap, PROVIDER_GOOGLE} from 'react-native-maps';
+import * as Location from 'expo-location';
 
 const heatmapData = [
     { latitude: 37.78825, longitude: -122.4324, intensity: 0.5 },
@@ -24,20 +25,36 @@ export default class HeatMap extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+        location: null
+    };
   }
 
-  signOut = () => {
-    auth.signOut();
-    this.props.navigation.navigate("Login");
-  }
 
-  report = () => {
-    this.props.navigation.navigate("Report");
-  }
+  componentDidMount = () => {
+    (async () => {  
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      setErrorMsg('Permission to access location was denied');
+      return;
+    }
 
+    let location = await Location.getCurrentPositionAsync({});
+    var newState = this.state;
+    newState.location = location;
+    this.setState(newState);
+    })();
+  }
 
   render() {
+    // loading screen....
+    if(this.state.location == null) {
+        return (
+            <SafeAreaView style={styles.login}>
+                
+            </SafeAreaView>
+        )
+    }
     return (
       <SafeAreaView style={styles.login}>
         
@@ -45,18 +62,18 @@ export default class HeatMap extends Component {
         provider={PROVIDER_GOOGLE}
         style={{ flex: 1 }}
         initialRegion={{
-            latitude: 37.78825,
-            longitude: -122.4324,
+            latitude: this.state.location.coords.latitude,
+            longitude: this.state.location.coords.longitude,
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
         }}
         >
             <Heatmap
-  points={heatmapData}
-  radius={40}
-  opacity={1}
-  onZoomRadiusChange={null}
-/>
+        points={heatmapData}
+        radius={40}
+        opacity={1}
+        onZoomRadiusChange={null}
+        />
         </MapView>
       </SafeAreaView>
     );
