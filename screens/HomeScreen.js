@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { 
-    StyleSheet, 
-    Text, 
-    TouchableOpacity, 
-    View, 
-    SafeAreaView, 
-    Dimensions,
-    Image,
-    TextInput,
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  SafeAreaView,
+  Dimensions,
+  Image,
+  TextInput,
 } from 'react-native';
 import Swiper from 'react-native-swiper';
 import { auth } from '../FirebaseHandler';
@@ -25,6 +25,11 @@ export default class HomeScreen extends Component {
     this.props.navigation.navigate("Login");
   }
 
+  report = () => {
+    this.props.navigation.navigate("Report");
+  }
+
+
   render() {
     return (
       <SafeAreaView style={styles.login}>
@@ -35,7 +40,7 @@ export default class HomeScreen extends Component {
               <Text style={styles.t2}>SafeZone</Text>
               <Text style={styles.t}>Empowering Voices, Promoting Safety</Text>
             </View>
-            
+
           </View>
 
 
@@ -49,7 +54,7 @@ export default class HomeScreen extends Component {
               <TouchableOpacity style={styles.halfSizeButton} onPress={() => { /* Handle button 1 action */ }}>
                 <Text style={styles.buttonText}>Heat Map</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.halfSizeButton} onPress={() => { /* Handle button 2 action */ }}>
+              <TouchableOpacity style={styles.halfSizeButton} onPress={() => { this.report(); }}>
                 <Text style={styles.buttonText}>Report</Text>
               </TouchableOpacity>
             </View>
@@ -70,14 +75,14 @@ export default class HomeScreen extends Component {
 }
 
 const styles = StyleSheet.create({
-    swiperView:{
-      flex: 0.75,
-    },  
-  innerText:{
+  swiperView: {
+    flex: 0.75,
+  },
+  innerText: {
     marginLeft: 10,
     marginBottom: 10
-  },  
-  
+  },
+
   loginText: {
     fontSize: 17,
     fontWeight: 'bold'
@@ -86,14 +91,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
-  
+
   login: {
     flex: 1,
     backgroundColor: "#74CAEF",
     justifyContent: 'space-evenly'
   },
 
-  
+
   t2: {
     fontSize: 35,
     fontWeight: '600',
@@ -109,7 +114,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
 
-  
+
   textContainer: {
     alignItems: 'center',
     marginTop: 10,
@@ -134,7 +139,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#08C91C",
     marginHorizontal: 5, // Adjust this spacing as needed
   },
-  
+
   button: {
     width: "80%",
     borderRadius: 25,
@@ -164,9 +169,9 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
 
-  
 
-  
+
+
 
   loginBtn: {
     width: '80%',
@@ -177,5 +182,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#08C91C",
   },
 
-  
+
 });
