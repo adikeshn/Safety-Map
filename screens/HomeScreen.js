@@ -55,18 +55,18 @@ export default class HomeScreen extends Component {
 
           <View style={styles.buttonContainer}>
             <View style={styles.buttonRow}>
-              <TouchableOpacity style={styles.halfSizeButton} onPress={() => { this.signOut(); }}>
-                <Text style={styles.buttonText}>Sign Out</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.halfSizeButton} onPress={() => { this.report(); }}>
-                <Text style={styles.buttonText}>Report</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.buttonRow}>
               <TouchableOpacity style={styles.loginBtn} onPress={() => {
                 this.heatmap();
               }}>
                 <Text style={styles.loginText}>Heat Map</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.buttonRow}>
+              <TouchableOpacity style={styles.halfSizeButton} onPress={() => { this.report(); }}>
+                <Text style={styles.buttonText}>Report</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.halfSizeButton} onPress={() => { this.signOut(); }}>
+                <Text style={styles.buttonText}>Sign Out</Text>
               </TouchableOpacity>
             </View>
           </View>
