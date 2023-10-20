@@ -30,6 +30,7 @@ export default class HeatMap extends Component {
       location: null,
       isKeyPageVisible: false,
       isMenuVisible: false,
+      heatMap: []
     };
   }
 
@@ -41,10 +42,15 @@ export default class HeatMap extends Component {
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync({});
+      const location = await Location.getCurrentPositionAsync({});
       var newState = this.state;
       newState.location = location;
       this.setState(newState);
+      this.setState({
+        heatMap: [{latitude: location.coords.latitude, longitude: location.coords.longitude, intensity: 2}]
+          
+      })
+
     })();
   }
 
@@ -87,7 +93,7 @@ export default class HeatMap extends Component {
           }}
         >
           <Heatmap
-            points={heatmapData}
+            points={this.state.heatMap}
             radius={40}
             opacity={1}
             onZoomRadiusChange={null}
