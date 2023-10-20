@@ -26,7 +26,7 @@ export default class HomeScreen extends Component {
 
     submit = () => {
 
-        addDoc(collection(FirebaseInfo.db, "SafeZone-Reports"), { Address: this.state.Address, Description: this.state.Description, Email: global.user })    
+        addDoc(collection(FirebaseInfo.db, "SafeZone-Reports"), { Address: this.state.Address, Description: this.state.Description, Email: global.user })
 
         this.props.navigation.navigate("HomeScreen");
     }
@@ -35,7 +35,7 @@ export default class HomeScreen extends Component {
         this.props.navigation.navigate("HomeScreen");
     }
 
-    
+
 
 
     render() {
@@ -55,36 +55,36 @@ export default class HomeScreen extends Component {
                             behavior="padding"
                             style={styles.Llogin}
                         >
-                                <View style={styles.inputView}>
-                                    <TextInput
-                                        style={styles.TextInput}
-                                        placeholder="Address: "
-                                        placeholderTextColor="#035DAF"
-                                        onChangeText={(GetAddress) => { this.setState({ Address: GetAddress }) }}
-                                    />
-                                </View>
-                                <View style={styles.inputView2}>
-                                    <TextInput
-                                        style={styles.TextInput}
-                                        multiline={true}
-                                        numberOfLines={4}
-                                        placeholder="Describe the situation: "
-                                        placeholderTextColor="#035DAF"
-                                        secureTextEntry={true}
-                                        value={this.state.password}
-                                        onChangeText={(GetDescription) => { this.setState({ Description: GetDescription }) }}
-                                    />
-                                </View>
+                            <View style={styles.inputView}>
+                                <TextInput
+                                    style={styles.TextInput}
+                                    placeholder="Address: "
+                                    placeholderTextColor="#035DAF"
+                                    onChangeText={(GetAddress) => { this.setState({ Address: GetAddress }) }}
+                                />
+                            </View>
+                            <View style={styles.inputView2}>
+                                <TextInput
+                                    style={styles.TextInput}
+                                    multiline={true}
+                                    numberOfLines={4}
+                                    placeholder="Describe the situation: "
+                                    placeholderTextColor="#035DAF"
+                                    secureTextEntry={true}
+                                    value={this.state.password}
+                                    onChangeText={(GetDescription) => { this.setState({ Description: GetDescription }) }}
+                                />
+                            </View>
 
-                                {
-                                    this.state.passworderrer ? (
-                                        <Text style={styles.error}>{this.state.errorText}</Text>
-                                    ) : null
-                                }
+                            {
+                                this.state.passworderrer ? (
+                                    <Text style={styles.error}>{this.state.errorText}</Text>
+                                ) : null
+                            }
                         </KeyboardAvoidingView>
                     </View>
-                        <View style={styles.buttonContainer}>
-                    
+                    <View style={styles.buttonContainer}>
+
                         <View style={styles.buttonRow}>
                             <TouchableOpacity style={styles.loginBtn} onPress={() => {
                                 this.submit();
@@ -113,8 +113,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
-      },
-   
+    },
+
     innerText: {
         marginLeft: 10,
     },
@@ -125,14 +125,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 20,
         borderRadius: 10,
-        
+
         marginBottom: 20,
     },
     loginText: {
         fontSize: 17,
         fontWeight: 'bold'
     },
-    
+
 
     login: {
         flex: 1,
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         marginBottom: 12,
     },
-    
+
 
     textContainer: {
         marginTop: 20,
@@ -169,10 +169,11 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         marginBottom: 10, // Adjust this margin as needed
     },
-    
 
-    
-    
+
+
+
+
     image: {
         resizeMode: 'contain',
         marginBottom: 5,  // Reduce the margin to 5 units
@@ -205,10 +206,10 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         backgroundColor: "#08C91C",
     },
-    
-    
-    
-    
+
+
+
+
 
     Llogin: {
         flex: 0.4,
@@ -220,7 +221,7 @@ const styles = StyleSheet.create({
 
 
 
-   
+
 
     TextInput: {
         height: 50,
@@ -229,10 +230,10 @@ const styles = StyleSheet.create({
         color: '#035DAF'
     },
 
-    
 
-    
 
-    
+
+
+
 
 });
