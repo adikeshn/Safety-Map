@@ -17,6 +17,8 @@ export default class HeatMap extends Component {
       isKeyPageVisible: false,
       heatmapData: [], // Store heatmap data here
       initialLatitudeDelta: 0.0922,
+      zoomLevel: 0, // Add a state variable to track zoom level
+      heatmapRadius: 100, // Initial radius of the heatmap
     };
   }
 
@@ -52,6 +54,16 @@ export default class HeatMap extends Component {
     });
   }
 
+  handleRegionChange = (region) => {
+    // Calculate the zoom level based on the latitudeDelta of the region
+    const zoomLevel = Math.log2(360 / region.latitudeDelta);
+
+    // Adjust the radius based on the zoom level
+    const radius = 100 / Math.pow(2, zoomLevel - 10); // Tweak the 10 to control the scaling effect
+
+    this.setState({ zoomLevel, heatmapRadius: radius });
+  }
+
   toggleKeyPage = () => {
     this.setState({ isKeyPageVisible: !this.state.isKeyPageVisible });
   }
@@ -76,13 +88,14 @@ export default class HeatMap extends Component {
             latitudeDelta: this.state.initialLatitudeDelta,
             longitudeDelta: 0.0421,
           }}
+          onRegionChange={this.handleRegionChange} // Add this event handler
         >
           <Heatmap
             points={this.state.heatmapData}
-            radius={100} // Fixed radius size
-            opacity={0.7} // Increase opacity to make it more vibrant
+            radius={this.state.heatmapRadius} // Adjust the radius
+            opacity={0.7}
             gradient={{
-              colors: ['red', 'orange', 'red'], // Modify the gradient colors
+              colors: ['red', 'orange', 'red'],
               startPoints: [0.1, 0.6, 1],
               colorMapSize: 256,
             }}
@@ -100,9 +113,6 @@ export default class HeatMap extends Component {
     );
   }
 }
-
-// Rest of your styles...
-
 
 const styles = StyleSheet.create({
   // Existing styles...
