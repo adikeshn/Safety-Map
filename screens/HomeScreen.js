@@ -8,17 +8,29 @@ import {
   SafeAreaView,
   Dimensions,
   Image,
-  TextInput,
+  Modal
 } from 'react-native';
-import Swiper from 'react-native-swiper';
 import { auth } from '../FirebaseHandler';
 import SlideShow from '../components/Slideshow';
+import Icon from 'react-native-vector-icons/AntDesign';
+
 export default class HomeScreen extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {conformationVisible: false};
   }
+
+
+  conformation = () => {
+      this.setState({conformationVisible: true})
+      setTimeout(() => this.setState({conformationVisible: false}), 2000)
+      this.props.navigation.setParams({
+        sentSuccess: false
+      })
+     
+  }
+   
 
   signOut = () => {
     auth.signOut();
@@ -35,9 +47,22 @@ export default class HomeScreen extends Component {
 
 
   render() {
+    this.props.route.params.sentSuccess ? this.conformation() : null
     return (
       <SafeAreaView style={styles.login}>
         <View style={styles.container}>
+            <Modal
+                animationType='fade'
+                transparent={true}
+                visible={this.state.conformationVisible}
+            >
+              <View style={styles.transparentBack}>
+                <Icon name="checkcircle" size={60} color="#2db002" />
+                <Text style={styles.t3}>SUCCESS</Text>
+              </View>
+
+
+            </Modal>
           <View style={styles.textContainer}>
             <Image style={styles.image} source={require("../assets/logo.png")} />
             <View style={styles.innerText}>
@@ -79,6 +104,12 @@ export default class HomeScreen extends Component {
 }
 
 const styles = StyleSheet.create({
+  t3: {
+    fontSize: 20,
+    color: '#2db002',
+    fontWeight: 'bold',
+    marginTop: 21,
+  },  
   swiperView: {
     flex: 0.75,
   },
@@ -118,7 +149,16 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
 
-
+  transparentBack: {
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    height: 220,
+    width: 220,
+    marginTop: Dimensions.get('screen').height * 0.35,
+    alignSelf: 'center',
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },  
   textContainer: {
     alignItems: 'center',
     marginTop: 10,

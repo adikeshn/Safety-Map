@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import React, { Component } from "react";
 import {
   StyleSheet,
@@ -9,7 +8,7 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
 } from "react-native";
-import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import FirebaseInfo from "../FirebaseHandler";
 
 export default class Register extends Component {
@@ -37,7 +36,6 @@ export default class Register extends Component {
         })
         FirebaseInfo.auth.signOut();
         this.props.navigation.navigate("Login");
-        const user = userCredential.user;
       })
       .catch((error) => {
         this.setState({

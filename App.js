@@ -20,7 +20,7 @@ export default class App extends Component {
         }}>
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Register" component={Register} />
-          <Stack.Screen name="HomeScreen" component={HomeScreen} />
+          <Stack.Screen name="HomeScreen" component={HomeScreen} initialParams={{sentSuccess: false}} />
           <Stack.Screen name="Report" component={Report} />
           <Stack.Screen name="HeatMap" component={HeatMap} />
 

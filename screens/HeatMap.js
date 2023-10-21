@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { StatusBar } from 'expo-status-bar';
 import {
   StyleSheet,
   Text,
@@ -7,13 +6,8 @@ import {
   View,
   SafeAreaView,
   Dimensions,
-  Image,
-  TextInput,
   Modal,
 } from 'react-native';
-import Swiper from 'react-native-swiper';
-import { auth } from '../FirebaseHandler';
-import SlideShow from '../components/Slideshow';
 import MapView, { Heatmap, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 
@@ -42,8 +36,8 @@ export default class HeatMap extends Component {
         return;
       }
 
-      const location = await Location.getCurrentPositionAsync({});
-      var newState = this.state;
+      let location = await Location.getCurrentPositionAsync({});
+      const newState = this.state;
       newState.location = location;
       this.setState(newState);
       this.setState({
@@ -88,7 +82,7 @@ export default class HeatMap extends Component {
           initialRegion={{
             latitude: this.state.location.coords.latitude,
             longitude: this.state.location.coords.longitude,
-            latitudeDelta: 0.0922,
+            latitudeDelta: 0.0422,
             longitudeDelta: 0.0421,
           }}
         >

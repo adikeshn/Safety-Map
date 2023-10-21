@@ -24,11 +24,13 @@ export default class HomeScreen extends Component {
         };
     }
 
-    submit = () => {
+    submit = async () => {
 
-        addDoc(collection(FirebaseInfo.db, "SafeZone-Reports"), { Address: this.state.Address, Description: this.state.Description, Email: global.user })
+        await addDoc(collection(FirebaseInfo.db, "SafeZone-Reports"), { Address: this.state.Address, Description: this.state.Description, Email: global.user }).then(() => {
+            this.props.navigation.navigate("HomeScreen", {sentSuccess: true})
+        })
 
-        this.props.navigation.navigate("HomeScreen");
+        
     }
 
     cancel = () => {
@@ -49,15 +51,13 @@ export default class HomeScreen extends Component {
                             <Text style={styles.t}>Reporting builds safer communities</Text>
                         </View>
                     </View>
-                    <View style={styles.InnerRect}>
-                        <KeyboardAvoidingView
+                    <KeyboardAvoidingView style={styles.InnerRect} 
                             keyboardVerticalOffset={50}
-                            behavior="padding"
-                            style={styles.Llogin}
-                        >
+                            behavior="padding">
+                       
                             <View style={styles.inputView}>
                                 <TextInput
-                                    style={styles.TextInput}
+                                    style={styles.TextInput2}
                                     placeholder="Address: "
                                     placeholderTextColor="#035DAF"
                                     onChangeText={(GetAddress) => { this.setState({ Address: GetAddress }) }}
@@ -70,8 +70,7 @@ export default class HomeScreen extends Component {
                                     numberOfLines={4}
                                     placeholder="Describe the situation: "
                                     placeholderTextColor="#035DAF"
-                                    secureTextEntry={true}
-                                    value={this.state.password}
+                                    value={this.state.Description}
                                     onChangeText={(GetDescription) => { this.setState({ Description: GetDescription }) }}
                                 />
                             </View>
@@ -81,8 +80,7 @@ export default class HomeScreen extends Component {
                                     <Text style={styles.error}>{this.state.errorText}</Text>
                                 ) : null
                             }
-                        </KeyboardAvoidingView>
-                    </View>
+                    </KeyboardAvoidingView>
                     <View style={styles.buttonContainer}>
 
                         <View style={styles.buttonRow}>
@@ -119,14 +117,11 @@ const styles = StyleSheet.create({
         marginLeft: 10,
     },
     InnerRect: {
-        flex: 0.45,
-        width: '85%',
-        backgroundColor: "#00B1D8",
+        flex: 0.55,
+        width: '100%',
         alignItems: 'center',
-        marginTop: 20,
         borderRadius: 10,
-
-        marginBottom: 20,
+        marginTop: 30
     },
     loginText: {
         fontSize: 17,
@@ -183,19 +178,23 @@ const styles = StyleSheet.create({
     },
 
     inputView: {
-        backgroundColor: "#74CAEF",
-        borderRadius: 9,
+        backgroundColor: "#00B1D8",
+        borderColor: '#02bce3',
+        borderWidth: 3,
+        borderRadius: 5,
         width: "80%",
         height: 45,
         marginBottom: 25,
+
     },
 
     inputView2: {
-        backgroundColor: "#74CAEF",
-        borderRadius: 9,
+        borderColor: '#02bce3',
+        borderWidth: 3,
+        backgroundColor: "#00B1D8",
+        borderRadius: 6,
         width: "80%",
         height: 175,
-        marginBottom: -160,
     },
 
     loginBtn: {
@@ -224,11 +223,17 @@ const styles = StyleSheet.create({
 
 
     TextInput: {
-        height: 50,
         flex: 1,
-        marginLeft: 20,
-        color: '#035DAF'
+        padding: 12,        
+        color: '#035DAF',
+        marginTop: 6
     },
+    TextInput2: {
+        flex: 1,
+        marginLeft: 15,
+        color: '#035DAF',
+
+    }
 
 
 
