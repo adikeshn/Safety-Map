@@ -1,34 +1,66 @@
 import React, { Component } from 'react';
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  SafeAreaView,
-  Dimensions,
-  Modal,
-} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, SafeAreaView, Dimensions, Modal } from 'react-native';
 import MapView, { Heatmap, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
+import firebase from 'firebase/app';
+import 'firebase/firestore';
+import axios from 'axios';
+import FirebaseInfo from '../FirebaseHandler';
+import { getDocs, collection } from 'firebase/firestore'; // Import the required Firestore functions
 
-const heatmapData = [
-  { latitude: 37.78825, longitude: -122.4324, intensity: 0.5 },
-  // Add more data points here
-];
+
+const API_KEY = 'AIzaSyDs2gO4O1PQyz06a_h0sbd1e2d-ef7Q6AY';
+
+
+async function parseAddressToLatLng(address) {
+  try {
+    const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+      params: {
+        address: address,
+        key: API_KEY,
+      },
+
+
+    });
+    console.log(response.data.status); // Add this line to log the coordinates
+    if (response.data.status === 'OK' && response.data.results.length > 0) {
+      const location = response.data.results[0].geometry.location;
+
+
+      return {
+        latitude: location.lat,
+        longitude: location.lng,
+
+
+      };
+    } else {
+      console.error('Geocoding error: Invalid response data');
+    }
+  } catch (error) {
+    console.error('Geocoding error:', error);
+  }
+
+
+  return null;
+}
+
+
+
 
 export default class HeatMap extends Component {
   constructor(props) {
     super(props);
 
+
     this.state = {
       location: null,
       isKeyPageVisible: false,
-      isMenuVisible: false,
-      heatMap: []
+      heatmapData: [], // Store heatmap data here
     };
   }
 
-  componentDidMount = () => {
+
+  async componentDidMount() {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -36,44 +68,46 @@ export default class HeatMap extends Component {
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync({});
-      const newState = this.state;
-      newState.location = location;
-      this.setState(newState);
-      this.setState({
-        heatMap: [{latitude: location.coords.latitude, longitude: location.coords.longitude, intensity: 2}]
-          
-      })
 
+      let location = await Location.getCurrentPositionAsync({});
+      this.setState({ location });
     })();
+
+
+    // Listen for changes in Firestore data
+    const querySnapshot = await getDocs(collection(FirebaseInfo.db, 'SafeZone-Reports'));
+    const heatmapData = querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      console.log('Address:', data.Address); // Add this line to log the addresses
+      // Parse the address to latitude and longitude
+      const { latitude, longitude } = parseAddressToLatLng(data.Address);
+
+
+      return { latitude, longitude, intensity: 1 };
+    });
+
+
+    this.setState({ heatmapData });
   }
+
+
+
 
   toggleKeyPage = () => {
     this.setState({ isKeyPageVisible: !this.state.isKeyPageVisible });
   }
 
-  toggleMenuPage = () => {
-    this.setState({ isMenuVisible: !this.state.isMenuVisible });
-  }
-
-  exit = () => {
-    this.props.navigation.navigate("HomeScreen");
-  }
-
-  report = () => {
-    this.setState({ isMenuVisible: !this.state.isMenuVisible });
-    this.props.navigation.navigate("Report");
-  }
 
   render() {
-    // loading screen....
-    if (this.state.location == null) {
+    if (this.state.location === null) {
       return (
         <SafeAreaView style={styles.login}>
           {/* Loading screen content */}
         </SafeAreaView>
       );
     }
+
+
     return (
       <SafeAreaView style={styles.login}>
         <MapView
@@ -82,12 +116,12 @@ export default class HeatMap extends Component {
           initialRegion={{
             latitude: this.state.location.coords.latitude,
             longitude: this.state.location.coords.longitude,
-            latitudeDelta: 0.0422,
+            latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           }}
         >
           <Heatmap
-            points={this.state.heatMap}
+            points={this.state.heatmapData}
             radius={40}
             opacity={1}
             onZoomRadiusChange={null}
@@ -95,66 +129,17 @@ export default class HeatMap extends Component {
         </MapView>
         <TouchableOpacity
           style={styles.keyButton}
-          onPress={this.toggleMenuPage}
+          onPress={this.toggleKeyPage}
         >
-          <Text style={styles.buttonText}>Menu</Text>
+          <Text style={styles.buttonText}>Open Key</Text>
         </TouchableOpacity>
         <Modal
           transparent={true}
           animationType="slide"
-          visible={this.state.isMenuVisible}
+          visible={this.state.isKeyPageVisible}
         >
           <View style={styles.keyPage}>
-
-            <TouchableOpacity
-              style={styles.closeMenuButton}
-              onPress={this.toggleKeyPage}
-            >
-              <Text style={styles.buttonText}>Key</Text>
-            </TouchableOpacity>
-
-            <Modal
-              transparent={true}
-              animationType="slide"
-              visible={this.state.isKeyPageVisible}
-            >
-              <View style={styles.keyPage}>
-                <Text style={styles.keyPageText}>Color Key</Text>
-                <Text style={styles.normalText}>Racism: Color1</Text>
-                <Text style={styles.normalText}>Assault: Color2</Text>
-                <Text style={styles.normalText}>Sexism: Color3</Text>
-                <Text style={styles.normalText}>Bullying: Color4</Text>
-                <Text style={styles.normalText}>Extraneous: Color5</Text>
-
-                <TouchableOpacity
-                  style={styles.closeKeyButton}
-                  onPress={this.toggleKeyPage}
-                >
-                  <Text style={styles.buttonText}>Close</Text>
-                </TouchableOpacity>
-              </View>
-            </Modal>  
-
-            <TouchableOpacity
-              style={styles.closeMenuButton}
-              onPress={this.report}
-            >
-              <Text style={styles.buttonText}>Report</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.closeMenuButton}
-              onPress={this.exit}
-            >
-              <Text style={styles.buttonText}>Return to Home</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.closeMenuButton}
-              onPress={this.toggleMenuPage}
-            >
-              <Text style={styles.buttonText}>Close</Text>
-            </TouchableOpacity>
+            {/* Key page content */}
           </View>
         </Modal>
       </SafeAreaView>
@@ -162,17 +147,25 @@ export default class HeatMap extends Component {
   }
 }
 
+
+// The rest of your styles...
+
+
+
+
 const styles = StyleSheet.create({
   // Existing styles...
 
+
   keyButton: {
     position: 'absolute',
-    top: 60,
-    right: 15,
+    top: 20,
+    right: 20,
     backgroundColor: "#08C91C",
     borderRadius: 25,
     padding: 10,
   },
+
 
   keyPage: {
     flex: 1,
@@ -180,6 +173,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
+
 
   keyPageText: {
     fontSize: 24,
@@ -193,19 +187,12 @@ const styles = StyleSheet.create({
     color: 'white',
     marginBottom: 20,
   },
-  closeMenuButton: {
-    backgroundColor: "#08C91C",
-    borderRadius: 25,
-    alignItems: "center",
-    width: "40%",
-    padding: 10,
-    marginBottom: 10,
-  },
+
+
   closeKeyButton: {
     backgroundColor: "#08C91C",
     borderRadius: 25,
     padding: 10,
-    marginBottom: 10,
   },
   swiperView: {
     flex: 0.75,
@@ -214,6 +201,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginBottom: 10
   },
+
 
   loginText: {
     fontSize: 17,
@@ -224,6 +212,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
+
   login: {
     flex: 1,
     backgroundColor: "#74CAEF",
@@ -231,10 +220,14 @@ const styles = StyleSheet.create({
   },
 
 
+
+
   t2: {
     fontSize: 35,
     fontWeight: '600',
   },
+
+
 
 
   t: {
@@ -245,6 +238,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'pink',
     marginHorizontal: 20,
   },
+
+
 
 
   textContainer: {
@@ -272,6 +267,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5, // Adjust this spacing as needed
   },
 
+
   button: {
     width: "80%",
     borderRadius: 25,
@@ -287,11 +283,12 @@ const styles = StyleSheet.create({
   },
   image: {
     resizeMode: 'contain',
-    marginBottom: 5,  // Reduce the margin to 5 units
+    marginBottom: 5, // Reduce the margin to 5 units
     width: Dimensions.get('window').width * 0.4,
     height: Dimensions.get('window').height * 0.2,
     flex: 0.6,
   },
+
 
   inputView: {
     backgroundColor: "#2FAED7",
@@ -300,6 +297,11 @@ const styles = StyleSheet.create({
     height: 45,
     marginBottom: 25,
   },
+
+
+
+
+
 
 
 
@@ -314,4 +316,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#08C91C",
   },
 });
+
+
+
 
