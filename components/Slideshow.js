@@ -23,7 +23,7 @@ export default function SlideShow() {
             <Text style={styles.descText}>54.4% of all crimes weren't reported in America last year</Text>
             <Text style={styles.descText}>Even more experiences are never shared due to them not being crimes</Text>
             <Image style={styles.image} source={require("../assets/WarningSign.png")} />
-            <Text style={styles.descText}>There are no platforms to viably report your unsafe encoutners directly to the community.</Text>
+            <Text style={styles.descText}>There are no platforms to viably report your unsafe encounters directly to the community.</Text>
           </View>
         </View>
 
