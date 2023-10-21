@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, SafeAreaView, Dimensions, Modal } from 'react-native';
-import MapView, { Heatmap, PROVIDER_GOOGLE } from 'react-native-maps';
+import { StyleSheet, Text, TouchableOpacity, View, SafeAreaView, Dimensions, Modal, ActivityIndicator } from 'react-native';
+import MapView, { Heatmap, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 import axios from 'axios';
 import FirebaseInfo from '../FirebaseHandler';
 import { getDocs, collection } from 'firebase/firestore'; // Import the required Firestore functions
+import Icon  from 'react-native-vector-icons/AntDesign';
 
 export default class HeatMap extends Component {
   constructor(props) {
@@ -17,8 +18,12 @@ export default class HeatMap extends Component {
       isKeyPageVisible: false,
       heatmapData: [], // Store heatmap data here
       initialLatitudeDelta: 0.0922,
+      isMenuVisible: false,
       zoomLevel: 0, // Add a state variable to track zoom level
-      heatmapRadius: 100, // Initial radius of the heatmap
+      heatmapRadius: 130,
+      reportData: [], // Initial radius of the heatmap,
+      infoVisible: false,
+      info: ["", "", ""]
     };
   }
 
@@ -49,7 +54,8 @@ export default class HeatMap extends Component {
       // Parse the address to latitude and longitude
       const latLng = await this.parseAddressToLatLng(data.Address);
       if (latLng) {
-        this.setState({ heatmapData: [...this.state.heatmapData, latLng] });
+        this.setState({ heatmapData: [...this.state.heatmapData, latLng],
+        reportData: [...this.state.reportData, {data: data, coords: latLng}] });
       }
     });
   }
@@ -57,31 +63,38 @@ export default class HeatMap extends Component {
   handleRegionChange = (region) => {
     // Calculate the zoom level based on the latitudeDelta of the region
     const zoomLevel = Math.log2(360 / region.latitudeDelta);
-
     // Adjust the radius based on the zoom level
     const radius = 100 / Math.pow(2, zoomLevel - 10); // Tweak the 10 to control the scaling effect
-
-    this.setState({ zoomLevel, heatmapRadius: radius });
+    this.setState({heatmapRadius: this.state.heatmapRadius+1})
   }
-
+  exit = () => {
+    this.props.navigation.navigate("HomeScreen");
+  }
+  report = () => {
+    this.setState({ isMenuVisible: !this.state.isMenuVisible });
+    this.props.navigation.navigate("Report");
+  }
+  toggleMenuPage = () => {
+    this.setState({ isMenuVisible: !this.state.isMenuVisible });
+  }
   toggleKeyPage = () => {
     this.setState({ isKeyPageVisible: !this.state.isKeyPageVisible });
   }
-
   render() {
     if (this.state.location === null) {
       return (
         <SafeAreaView style={styles.login}>
-          {/* Loading screen content */}
+          <ActivityIndicator  size={40}/>
         </SafeAreaView>
       );
     }
 
     return (
       <SafeAreaView style={styles.login}>
+         
         <MapView
           provider={PROVIDER_GOOGLE}
-          style={{ flex: 1 }}
+          style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center'}}
           initialRegion={{
             latitude: this.state.location.coords.latitude,
             longitude: this.state.location.coords.longitude,
@@ -90,6 +103,23 @@ export default class HeatMap extends Component {
           }}
           onRegionChange={this.handleRegionChange} // Add this event handler
         >
+          
+          
+          {
+            this.state.reportData.map((data, key) => (
+              <Marker 
+              
+              coordinate={{latitude: data.coords.latitude, longitude: data.coords.longitude}}
+              
+              onPress={() => {this.setState({info: [data.data.Address, data.data.Email, data.data.Description], infoVisible: true} )}}
+              ></Marker>
+
+            )
+
+
+
+            )
+          }
           <Heatmap
             points={this.state.heatmapData}
             radius={this.state.heatmapRadius} // Adjust the radius
@@ -99,32 +129,146 @@ export default class HeatMap extends Component {
               startPoints: [0.1, 0.6, 1],
               colorMapSize: 256,
             }}
+            
           />
         </MapView>
-        <TouchableOpacity style={styles.keyButton} onPress={this.toggleKeyPage}>
+
+        {this.state.infoVisible ?
+              <View style={styles.rect}>
+                
+                <TouchableOpacity onPress={() => {this.setState({infoVisible: false})}}><Icon name={'close'} color={'white'} size={33} style={{alignSelf: 'flex-end', marginRight: 5, marginTop: 3}} /></TouchableOpacity>
+                <Text style= {styles.address}>{this.state.info[0]}</Text>
+                <Text style={styles.email} >{this.state.info[1]}</Text>
+                <View style={styles.line}></View>
+                <Text style={styles.desc} >{this.state.info[2]}</Text>
+             </View> 
+             
+             : null
+
+          }
+
+        
+        <TouchableOpacity style={styles.keyButton} onPress={this.toggleMenuPage}>
           <Text style={styles.buttonText}>Open Key</Text>
         </TouchableOpacity>
-        <Modal transparent={true} animationType="slide" visible={this.state.isKeyPageVisible}>
+        
+        <Modal transparent={true} animationType="slide" visible={this.state.isMenuVisible}>
           <View style={styles.keyPage}>
-            {/* Key page content */}
+          <TouchableOpacity
+              style={styles.closeMenuButton}
+              onPress={this.toggleKeyPage}
+            >
+              <Text style={styles.buttonText}>Key</Text>
+            </TouchableOpacity>
+
+            <Modal
+              transparent={true}
+              animationType="slide"
+              visible={this.state.isKeyPageVisible}
+            >
+              <View style={styles.keyPage}>
+                <Text style={styles.keyPageText}>Color Key</Text>
+                <Text style={styles.normalText}>Racism: Color1</Text>
+                <Text style={styles.normalText}>Assault: Color2</Text>
+                <Text style={styles.normalText}>Sexism: Color3</Text>
+                <Text style={styles.normalText}>Bullying: Color4</Text>
+                <Text style={styles.normalText}>Extraneous: Color5</Text>
+
+                <TouchableOpacity
+                  style={styles.closeKeyButton}
+                  onPress={this.toggleKeyPage}
+                >
+                  <Text style={styles.buttonText}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </Modal>  
+
+            <TouchableOpacity
+              style={styles.closeMenuButton}
+              onPress={this.report}
+            >
+              <Text style={styles.buttonText}>Report</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.closeMenuButton}
+              onPress={this.exit}
+            >
+              <Text style={styles.buttonText}>Return to Home</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.closeMenuButton}
+              onPress={this.toggleMenuPage}
+            >
+              <Text style={styles.buttonText}>Close</Text>
+            </TouchableOpacity>
           </View>
         </Modal>
+       
       </SafeAreaView>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  closeMenuButton: {
+    backgroundColor: "#08C91C",
+    borderRadius: 25,
+    alignItems: "center",
+    width: "40%",
+    padding: 10,
+    marginBottom: 10,
+  },
   // Existing styles...
-
-
-  keyButton: {
+  line: {
+    width: '90%',
+    backgroundColor: "#50D1ED",
+    height: 5,
+    marginTop: 14,
+    alignSelf: 'center',
+    borderRadius: 10
+  },
+  address: {
+    fontSize: 19,
     position: 'absolute',
-    top: 20,
-    right: 20,
+    padding: 10,
+    fontWeight: 'bold',
+    color: 'white'
+
+  },
+  email: {
+    fontSize: 19,
+    marginLeft: 14,
+    marginTop: 3,
+    color: 'white'
+
+  },
+  desc: {
+    fontSize: 16,
+    padding: 15,
+    color: 'white'
+
+  },
+  rect: {
+    backgroundColor: '#00B1D8',
+    width: Dimensions.get('screen').width * 0.9,
+    height: Dimensions.get('screen').height * 0.3,
+    marginTop: Dimensions.get('screen').height * 0.65,
+    alignSelf: 'center',
+    position: 'absolute',
+    borderRadius: 10
+  },
+  keyButton: {
+    width: 100,
+    height: 40,
     backgroundColor: "#08C91C",
     borderRadius: 25,
     padding: 10,
+    position: 'absolute',
+    alignSelf: 'flex-end',
+    marginTop: 50,
+    right: 5
   },
 
 
