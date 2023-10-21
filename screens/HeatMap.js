@@ -8,37 +8,25 @@ import axios from 'axios';
 import FirebaseInfo from '../FirebaseHandler';
 import { getDocs, collection } from 'firebase/firestore'; // Import the required Firestore functions
 
-
-
-
-
-
-
-
-
 export default class HeatMap extends Component {
   constructor(props) {
     super(props);
-
 
     this.state = {
       location: null,
       isKeyPageVisible: false,
       heatmapData: [], // Store heatmap data here
+      initialLatitudeDelta: 0.0922,
     };
   }
 
-
   async parseAddressToLatLng(address) {
-    var a
-    await Location.geocodeAsync(address).then((location) => {
-       if (location.length == 0) a = 0
-       else a = {latitude: location[0].latitude, longitude: location[0].longitude}
-     })
-     return a
-     
-   
-   }
+    let a = await Location.geocodeAsync(address);
+    if (a.length === 0) {
+      return null;
+    }
+    return { latitude: a[0].latitude, longitude: a[0].longitude };
+  }
 
   async componentDidMount() {
     (async () => {
@@ -47,7 +35,6 @@ export default class HeatMap extends Component {
         setErrorMsg('Permission to access location was denied');
         return;
       }
-
 
       let location = await Location.getCurrentPositionAsync({});
       this.setState({ location });
@@ -58,26 +45,16 @@ export default class HeatMap extends Component {
     querySnapshot.docs.map(async (doc) => {
       const data = doc.data();
       // Parse the address to latitude and longitude
-      await this.parseAddressToLatLng(data.Address).then((data) => {
-        if (data != 0){
-          this.setState({heatmapData: [...this.state.heatmapData, {latitude: data.latitude, longitude: data.longitude}]})
-        }
-      })
-      
-      
+      const latLng = await this.parseAddressToLatLng(data.Address);
+      if (latLng) {
+        this.setState({ heatmapData: [...this.state.heatmapData, latLng] });
+      }
     });
-
-
   }
-
-
-
 
   toggleKeyPage = () => {
-    console.log(this.state.heatmapData)
     this.setState({ isKeyPageVisible: !this.state.isKeyPageVisible });
   }
-
 
   render() {
     if (this.state.location === null) {
@@ -88,7 +65,6 @@ export default class HeatMap extends Component {
       );
     }
 
-
     return (
       <SafeAreaView style={styles.login}>
         <MapView
@@ -97,28 +73,25 @@ export default class HeatMap extends Component {
           initialRegion={{
             latitude: this.state.location.coords.latitude,
             longitude: this.state.location.coords.longitude,
-            latitudeDelta: 0.0922,
+            latitudeDelta: this.state.initialLatitudeDelta,
             longitudeDelta: 0.0421,
           }}
         >
           <Heatmap
             points={this.state.heatmapData}
-            radius={300}
-            opacity={0.3}
-            onZoomRadiusChange={0}
+            radius={100} // Fixed radius size
+            opacity={0.7} // Increase opacity to make it more vibrant
+            gradient={{
+              colors: ['red', 'orange', 'red'], // Modify the gradient colors
+              startPoints: [0.1, 0.6, 1],
+              colorMapSize: 256,
+            }}
           />
         </MapView>
-        <TouchableOpacity
-          style={styles.keyButton}
-          onPress={this.toggleKeyPage}
-        >
+        <TouchableOpacity style={styles.keyButton} onPress={this.toggleKeyPage}>
           <Text style={styles.buttonText}>Open Key</Text>
         </TouchableOpacity>
-        <Modal
-          transparent={true}
-          animationType="slide"
-          visible={this.state.isKeyPageVisible}
-        >
+        <Modal transparent={true} animationType="slide" visible={this.state.isKeyPageVisible}>
           <View style={styles.keyPage}>
             {/* Key page content */}
           </View>
@@ -128,10 +101,7 @@ export default class HeatMap extends Component {
   }
 }
 
-
-// The rest of your styles...
-
-
+// Rest of your styles...
 
 
 const styles = StyleSheet.create({
