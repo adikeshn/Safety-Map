@@ -9,40 +9,9 @@ import FirebaseInfo from '../FirebaseHandler';
 import { getDocs, collection } from 'firebase/firestore'; // Import the required Firestore functions
 
 
-const API_KEY = 'AIzaSyDs2gO4O1PQyz06a_h0sbd1e2d-ef7Q6AY';
 
 
-async function parseAddressToLatLng(address) {
-  try {
-    const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
-      params: {
-        address: address,
-        key: API_KEY,
-      },
 
-
-    });
-    console.log(response.data.status); // Add this line to log the coordinates
-    if (response.data.status === 'OK' && response.data.results.length > 0) {
-      const location = response.data.results[0].geometry.location;
-
-
-      return {
-        latitude: location.lat,
-        longitude: location.lng,
-
-
-      };
-    } else {
-      console.error('Geocoding error: Invalid response data');
-    }
-  } catch (error) {
-    console.error('Geocoding error:', error);
-  }
-
-
-  return null;
-}
 
 
 
@@ -60,6 +29,17 @@ export default class HeatMap extends Component {
   }
 
 
+  async parseAddressToLatLng(address) {
+    var a
+    await Location.geocodeAsync(address).then((location) => {
+       if (location.length == 0) a = 0
+       else a = {latitude: location[0].latitude, longitude: location[0].longitude}
+     })
+     return a
+     
+   
+   }
+
   async componentDidMount() {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -73,27 +53,28 @@ export default class HeatMap extends Component {
       this.setState({ location });
     })();
 
-
     // Listen for changes in Firestore data
     const querySnapshot = await getDocs(collection(FirebaseInfo.db, 'SafeZone-Reports'));
-    const heatmapData = querySnapshot.docs.map((doc) => {
+    querySnapshot.docs.map(async (doc) => {
       const data = doc.data();
-      console.log('Address:', data.Address); // Add this line to log the addresses
       // Parse the address to latitude and longitude
-      const { latitude, longitude } = parseAddressToLatLng(data.Address);
-
-
-      return { latitude, longitude, intensity: 1 };
+      await this.parseAddressToLatLng(data.Address).then((data) => {
+        if (data != 0){
+          this.setState({heatmapData: [...this.state.heatmapData, {latitude: data.latitude, longitude: data.longitude}]})
+        }
+      })
+      
+      
     });
 
 
-    this.setState({ heatmapData });
   }
 
 
 
 
   toggleKeyPage = () => {
+    console.log(this.state.heatmapData)
     this.setState({ isKeyPageVisible: !this.state.isKeyPageVisible });
   }
 
@@ -122,9 +103,9 @@ export default class HeatMap extends Component {
         >
           <Heatmap
             points={this.state.heatmapData}
-            radius={40}
-            opacity={1}
-            onZoomRadiusChange={null}
+            radius={300}
+            opacity={0.3}
+            onZoomRadiusChange={0}
           />
         </MapView>
         <TouchableOpacity
