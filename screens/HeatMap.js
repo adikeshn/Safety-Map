@@ -20,7 +20,7 @@ export default class HeatMap extends Component {
       initialLatitudeDelta: 0.0922,
       isMenuVisible: false,
       zoomLevel: 0, // Add a state variable to track zoom level
-      heatmapRadius: 130,
+      heatmapRadius: 240,
       reportData: [], // Initial radius of the heatmap,
       infoVisible: false,
       info: ["", "", ""]
@@ -32,7 +32,7 @@ export default class HeatMap extends Component {
     if (a.length === 0) {
       return null;
     }
-    return { latitude: a[0].latitude, longitude: a[0].longitude };
+    return { latitude: a[0].latitude, longitude: a[0].longitude, weight: 0.3 };
   }
 
   async componentDidMount() {
@@ -67,6 +67,7 @@ export default class HeatMap extends Component {
     const radius = 100 / Math.pow(2, zoomLevel - 10); // Tweak the 10 to control the scaling effect
     this.setState({heatmapRadius: this.state.heatmapRadius+1})
   }
+
   exit = () => {
     this.props.navigation.navigate("HomeScreen");
   }
@@ -108,7 +109,7 @@ export default class HeatMap extends Component {
           {
             this.state.reportData.map((data, key) => (
               <Marker 
-              
+              key={key}
               coordinate={{latitude: data.coords.latitude, longitude: data.coords.longitude}}
               
               onPress={() => {this.setState({info: [data.data.Address, data.data.Email, data.data.Description], infoVisible: true} )}}
@@ -125,8 +126,8 @@ export default class HeatMap extends Component {
             radius={this.state.heatmapRadius} // Adjust the radius
             opacity={0.7}
             gradient={{
-              colors: ['red', 'orange', 'red'],
-              startPoints: [0.1, 0.6, 1],
+              colors: ['yellow', 'orange', 'red'],
+              startPoints: [0.4, 0.5, 0.7],
               colorMapSize: 256,
             }}
             
@@ -135,12 +136,19 @@ export default class HeatMap extends Component {
 
         {this.state.infoVisible ?
               <View style={styles.rect}>
+                <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+                    
+                    <View style = {{flexDirection: 'column', marginTop: 10, left: 12}}>
+                      <Text style= {styles.address}>{this.state.info[0]}</Text>
+                      <Text style={styles.email} >{this.state.info[1]}</Text>
+                    </View>
+                    
+                    <TouchableOpacity onPress={() => {this.setState({infoVisible: false})}}><Icon name={'close'} color={'white'} size={33} style={{ right: 3, bottom: 3}} /></TouchableOpacity>
+                </View>
+                  <View style={styles.line}></View>
+                  <Text style={styles.desc} >{this.state.info[2]}</Text>
                 
-                <TouchableOpacity onPress={() => {this.setState({infoVisible: false})}}><Icon name={'close'} color={'white'} size={33} style={{alignSelf: 'flex-end', marginRight: 5, marginTop: 3}} /></TouchableOpacity>
-                <Text style= {styles.address}>{this.state.info[0]}</Text>
-                <Text style={styles.email} >{this.state.info[1]}</Text>
-                <View style={styles.line}></View>
-                <Text style={styles.desc} >{this.state.info[2]}</Text>
+                
              </View> 
              
              : null
@@ -231,17 +239,15 @@ const styles = StyleSheet.create({
   },
   address: {
     fontSize: 19,
-    position: 'absolute',
-    padding: 10,
     fontWeight: 'bold',
     color: 'white'
 
   },
   email: {
     fontSize: 19,
-    marginLeft: 14,
-    marginTop: 3,
-    color: 'white'
+    color: 'white',
+    left: 4,
+    top: 2
 
   },
   desc: {
