@@ -8,6 +8,7 @@ import axios from 'axios';
 import FirebaseInfo from '../FirebaseHandler';
 import { getDocs, collection } from 'firebase/firestore'; // Import the required Firestore functions
 import Icon  from 'react-native-vector-icons/AntDesign';
+import Entypo from 'react-native-vector-icons/Feather'
 
 export default class HeatMap extends Component {
   constructor(props) {
@@ -20,7 +21,7 @@ export default class HeatMap extends Component {
       initialLatitudeDelta: 0.0922,
       isMenuVisible: false,
       zoomLevel: 0, // Add a state variable to track zoom level
-      heatmapRadius: 240,
+      heatmapRadius: 600,
       reportData: [], // Initial radius of the heatmap,
       infoVisible: false,
       info: ["", "", ""]
@@ -34,6 +35,8 @@ export default class HeatMap extends Component {
     }
     return { latitude: a[0].latitude, longitude: a[0].longitude, weight: 0.3 };
   }
+
+
 
   async componentDidMount() {
     (async () => {
@@ -65,7 +68,6 @@ export default class HeatMap extends Component {
     const zoomLevel = Math.log2(360 / region.latitudeDelta);
     // Adjust the radius based on the zoom level
     const radius = 100 / Math.pow(2, zoomLevel - 10); // Tweak the 10 to control the scaling effect
-    this.setState({heatmapRadius: this.state.heatmapRadius+1})
   }
 
   exit = () => {
@@ -102,7 +104,7 @@ export default class HeatMap extends Component {
             latitudeDelta: this.state.initialLatitudeDelta,
             longitudeDelta: 0.0421,
           }}
-          onRegionChange={this.handleRegionChange} // Add this event handler
+          onRegionChangeComplete={this.handleRegionChange} // Add this event handler
         >
           
           
@@ -114,11 +116,7 @@ export default class HeatMap extends Component {
               
               onPress={() => {this.setState({info: [data.data.Address, data.data.Email, data.data.Description], infoVisible: true} )}}
               ></Marker>
-
             )
-
-
-
             )
           }
           <Heatmap
@@ -157,7 +155,7 @@ export default class HeatMap extends Component {
 
         
         <TouchableOpacity style={styles.keyButton} onPress={this.toggleMenuPage}>
-          <Text style={styles.buttonText}>Open Key</Text>
+          <Entypo size={38} name='menu' />
         </TouchableOpacity>
         
         <Modal transparent={true} animationType="slide" visible={this.state.isMenuVisible}>
@@ -266,9 +264,6 @@ const styles = StyleSheet.create({
     borderRadius: 10
   },
   keyButton: {
-    width: 100,
-    height: 40,
-    backgroundColor: "#08C91C",
     borderRadius: 25,
     padding: 10,
     position: 'absolute',
@@ -408,14 +403,6 @@ const styles = StyleSheet.create({
     height: 45,
     marginBottom: 25,
   },
-
-
-
-
-
-
-
-
 
 
   loginBtn: {
