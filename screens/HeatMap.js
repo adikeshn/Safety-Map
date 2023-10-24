@@ -18,13 +18,12 @@ export default class HeatMap extends Component {
       location: null,
       isKeyPageVisible: false,
       heatmapData: [], // Store heatmap data here
-      initialLatitudeDelta: 0.0922,
       isMenuVisible: false,
-      zoomLevel: 0, // Add a state variable to track zoom level
-      heatmapRadius: 600,
+      heatmapRadius: 370,
       reportData: [], // Initial radius of the heatmap,
       infoVisible: false,
-      info: ["", "", ""]
+      info: ["", "", ""],
+      outOfZoom: false
     };
   }
 
@@ -33,7 +32,7 @@ export default class HeatMap extends Component {
     if (a.length === 0) {
       return null;
     }
-    return { latitude: a[0].latitude, longitude: a[0].longitude, weight: 0.3 };
+    return { latitude: a[0].latitude, longitude: a[0].longitude};
   }
 
 
@@ -61,13 +60,16 @@ export default class HeatMap extends Component {
         reportData: [...this.state.reportData, {data: data, coords: latLng}] });
       }
     });
+
   }
 
   handleRegionChange = (region) => {
-    // Calculate the zoom level based on the latitudeDelta of the region
-    const zoomLevel = Math.log2(360 / region.latitudeDelta);
-    // Adjust the radius based on the zoom level
-    const radius = 100 / Math.pow(2, zoomLevel - 10); // Tweak the 10 to control the scaling effect
+
+    if (region.longitudeDelta > 2.1)
+      this.setState({outOfZoom: true})
+    else if (this.state.outOfZoom)
+      this.setState({outOfZoom: false})
+
   }
 
   exit = () => {
@@ -79,6 +81,7 @@ export default class HeatMap extends Component {
   }
   toggleMenuPage = () => {
     this.setState({ isMenuVisible: !this.state.isMenuVisible });
+    console.log(this.state.heatmapData)
   }
   toggleKeyPage = () => {
     this.setState({ isKeyPageVisible: !this.state.isKeyPageVisible });
@@ -101,7 +104,7 @@ export default class HeatMap extends Component {
           initialRegion={{
             latitude: this.state.location.coords.latitude,
             longitude: this.state.location.coords.longitude,
-            latitudeDelta: this.state.initialLatitudeDelta,
+            latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           }}
           onRegionChangeComplete={this.handleRegionChange} // Add this event handler
@@ -109,27 +112,31 @@ export default class HeatMap extends Component {
           
           
           {
-            this.state.reportData.map((data, key) => (
+            !this.state.outOfZoom ? this.state.reportData.map((data, key) => (
               <Marker 
               key={key}
               coordinate={{latitude: data.coords.latitude, longitude: data.coords.longitude}}
               
               onPress={() => {this.setState({info: [data.data.Address, data.data.Email, data.data.Description], infoVisible: true} )}}
               ></Marker>
-            )
-            )
+            ) 
+            ) : null 
           }
-          <Heatmap
-            points={this.state.heatmapData}
-            radius={this.state.heatmapRadius} // Adjust the radius
-            opacity={0.7}
-            gradient={{
-              colors: ['yellow', 'orange', 'red'],
-              startPoints: [0.4, 0.5, 0.7],
-              colorMapSize: 256,
-            }}
-            
-          />
+          {
+
+            !this.state.outOfZoom ?
+                <Heatmap
+                  points={this.state.heatmapData}
+                  radius={this.state.heatmapRadius} // Adjust the radius
+                  opacity={0.7}
+                  gradient={{
+                    colors: ['blue', 'green', 'yellow', 'red'],
+                    startPoints: [0.25, 0.5, 0.75, 1],
+                    colorMapSize: 300,
+                  }}
+                  
+                /> : null
+          }
         </MapView>
 
         {this.state.infoVisible ?
