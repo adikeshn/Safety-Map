@@ -107,7 +107,7 @@ export default class HeatMap extends Component {
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           }}
-          onRegionChangeComplete={this.handleRegionChange} // Add this event handler
+          onRegionChange={this.handleRegionChange} // Add this event handler
         >
           
           
