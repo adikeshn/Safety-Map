@@ -12,11 +12,19 @@ import {
     TextInput,
 } from 'react-native';
 
+
 import { collection, addDoc } from 'firebase/firestore';
 import FirebaseInfo from '../FirebaseHandler';
+import { OPEN_AI_API_KEY } from '../secrets';
+
+
 export default class HomeScreen extends Component {
     constructor(props) {
         super(props);
+
+
+        this.apiKey = OPEN_AI_API_KEY;
+
 
         this.state = {
             Address: '',
@@ -24,18 +32,76 @@ export default class HomeScreen extends Component {
         };
     }
 
-    submit = async () => {
 
-        await addDoc(collection(FirebaseInfo.db, "SafeZone-Reports"), { Address: this.state.Address, Description: this.state.Description, Email: global.user }).then(() => {
-            this.props.navigation.navigate("HomeScreen", {sentSuccess: true})
-        })
 
-        
+
+    grouping = async (description) => {
+        try {
+            let b = "Classify the following sentence into either racism, sexism, assault, or other: " + this.state.Description + ". Return the data as a JSON string with a key called category indicating the classified category and a key called intesity which is a value between zero and one indicating your confidence in this classification.";
+            const res = await fetch("https://api.openai.com/v1/completions", {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.apiKey}`
+                },
+                body: JSON.stringify({
+                    model: "gpt-3.5-turbo-instruct",
+                    prompt: b,
+                    max_tokens: 30,
+                    temperature: 0,
+                }),
+            });
+            const json = await res.json();
+            console.log(json.choices[0].text);
+            const values = JSON.parse(json.choices[0].text);
+            console.log(values.category);
+            console.log(values.intensity);
+            console.log(b);
+            return {
+                category: values.category,
+                intensity: values.intensity
+            };
+        } catch (error) {
+            console.error("Error in grouping function:", error);
+            throw error; // Rethrow the error to propagate it further if needed
+        }
     }
+
+
+
+
+    submit = async () => {
+        try {
+            let group = await this.grouping(this.state.Description);
+
+
+            await addDoc(collection(FirebaseInfo.db, "Reports2"), {
+                Address: this.state.Address,
+                Description: this.state.Description,
+                Email: global.user,
+                Category: group.category,
+                Intensity: group.intensity
+            });
+
+
+            this.props.navigation.navigate("HomeScreen", { sentSuccess: true });
+        } catch (error) {
+            console.error("Error submitting report:", error);
+            // Handle the error here, e.g., show a message to the user
+        }
+    }
+
+
+
 
     cancel = () => {
         this.props.navigation.navigate("HomeScreen");
     }
+
+
+
+
 
 
 
@@ -51,37 +117,40 @@ export default class HomeScreen extends Component {
                             <Text style={styles.t}>Reporting builds safer communities</Text>
                         </View>
                     </View>
-                    <KeyboardAvoidingView style={styles.InnerRect} 
-                            keyboardVerticalOffset={50}
-                            behavior="padding">
-                       
-                            <View style={styles.inputView}>
-                                <TextInput
-                                    style={styles.TextInput2}
-                                    placeholder="Address: "
-                                    placeholderTextColor="#035DAF"
-                                    onChangeText={(GetAddress) => { this.setState({ Address: GetAddress }) }}
-                                />
-                            </View>
-                            <View style={styles.inputView2}>
-                                <TextInput
-                                    style={styles.TextInput}
-                                    multiline={true}
-                                    numberOfLines={4}
-                                    placeholder="Describe the situation: "
-                                    placeholderTextColor="#035DAF"
-                                    value={this.state.Description}
-                                    onChangeText={(GetDescription) => { this.setState({ Description: GetDescription }) }}
-                                />
-                            </View>
+                    <KeyboardAvoidingView style={styles.InnerRect}
+                        keyboardVerticalOffset={50}
+                        behavior="padding">
 
-                            {
-                                this.state.passworderrer ? (
-                                    <Text style={styles.error}>{this.state.errorText}</Text>
-                                ) : null
-                            }
+
+                        <View style={styles.inputView}>
+                            <TextInput
+                                style={styles.TextInput2}
+                                placeholder="Address: "
+                                placeholderTextColor="#035DAF"
+                                onChangeText={(GetAddress) => { this.setState({ Address: GetAddress }) }}
+                            />
+                        </View>
+                        <View style={styles.inputView2}>
+                            <TextInput
+                                style={styles.TextInput}
+                                multiline={true}
+                                numberOfLines={4}
+                                placeholder="Describe the situation: "
+                                placeholderTextColor="#035DAF"
+                                value={this.state.Description}
+                                onChangeText={(GetDescription) => { this.setState({ Description: GetDescription }) }}
+                            />
+                        </View>
+
+
+                        {
+                            this.state.passworderrer ? (
+                                <Text style={styles.error}>{this.state.errorText}</Text>
+                            ) : null
+                        }
                     </KeyboardAvoidingView>
                     <View style={styles.buttonContainer}>
+
 
                         <View style={styles.buttonRow}>
                             <TouchableOpacity style={styles.loginBtn} onPress={() => {
@@ -90,6 +159,7 @@ export default class HomeScreen extends Component {
                                 <Text style={styles.loginText}>Submit</Text>
                             </TouchableOpacity>
                         </View>
+
 
                         <View style={styles.buttonRow}>
                             <TouchableOpacity style={styles.loginBtn} onPress={() => {
@@ -100,6 +170,7 @@ export default class HomeScreen extends Component {
                         </View>
                     </View>
 
+
                     <StatusBar style="auto" />
                 </View>
             </SafeAreaView>
@@ -107,11 +178,13 @@ export default class HomeScreen extends Component {
     }
 }
 
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
     },
+
 
     innerText: {
         marginLeft: 10,
@@ -129,11 +202,15 @@ const styles = StyleSheet.create({
     },
 
 
+
+
     login: {
         flex: 1,
         backgroundColor: "#74CAEF",
         justifyContent: 'space-evenly'
     },
+
+
 
 
     t2: {
@@ -142,11 +219,15 @@ const styles = StyleSheet.create({
     },
 
 
+
+
     t: {
         fontSize: 15,
         fontWeight: '600',
         marginBottom: 12,
     },
+
+
 
 
     textContainer: {
@@ -169,13 +250,19 @@ const styles = StyleSheet.create({
 
 
 
+
+
+
+
+
     image: {
         resizeMode: 'contain',
-        marginBottom: 5,  // Reduce the margin to 5 units
+        marginBottom: 5, // Reduce the margin to 5 units
         width: Dimensions.get('window').width * 0.4,
         height: Dimensions.get('window').height * 0.2,
         flex: 0.55,
     },
+
 
     inputView: {
         backgroundColor: "#00B1D8",
@@ -186,7 +273,9 @@ const styles = StyleSheet.create({
         height: 45,
         marginBottom: 25,
 
+
     },
+
 
     inputView2: {
         borderColor: '#02bce3',
@@ -197,6 +286,7 @@ const styles = StyleSheet.create({
         height: 175,
     },
 
+
     loginBtn: {
         width: '80%',
         borderRadius: 25,
@@ -205,6 +295,11 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         backgroundColor: "#08C91C",
     },
+
+
+
+
+
 
 
 
@@ -222,9 +317,15 @@ const styles = StyleSheet.create({
 
 
 
+
+
+
+
+
+
     TextInput: {
         flex: 1,
-        padding: 12,        
+        padding: 12,
         color: '#035DAF',
         marginTop: 6
     },
@@ -232,6 +333,7 @@ const styles = StyleSheet.create({
         flex: 1,
         marginLeft: 15,
         color: '#035DAF',
+
 
     }
 
@@ -241,4 +343,13 @@ const styles = StyleSheet.create({
 
 
 
+
+
+
+
+
+
+
 });
+
+

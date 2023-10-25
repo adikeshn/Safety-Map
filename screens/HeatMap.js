@@ -7,12 +7,14 @@ import 'firebase/firestore';
 import axios from 'axios';
 import FirebaseInfo from '../FirebaseHandler';
 import { getDocs, collection } from 'firebase/firestore'; // Import the required Firestore functions
-import Icon  from 'react-native-vector-icons/AntDesign';
+import Icon from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Feather'
+
 
 export default class HeatMap extends Component {
   constructor(props) {
     super(props);
+
 
     this.state = {
       location: null,
@@ -27,14 +29,14 @@ export default class HeatMap extends Component {
     };
   }
 
+
   async parseAddressToLatLng(address) {
     let a = await Location.geocodeAsync(address);
     if (a.length === 0) {
       return null;
     }
-    return { latitude: a[0].latitude, longitude: a[0].longitude};
+    return { latitude: a[0].latitude, longitude: a[0].longitude };
   }
-
 
 
   async componentDidMount() {
@@ -45,134 +47,135 @@ export default class HeatMap extends Component {
         return;
       }
 
+
       let location = await Location.getCurrentPositionAsync({});
       this.setState({ location });
     })();
 
+
     // Listen for changes in Firestore data
-    const querySnapshot = await getDocs(collection(FirebaseInfo.db, 'SafeZone-Reports'));
+    const querySnapshot = await getDocs(collection(FirebaseInfo.db, 'Reports2'));
     querySnapshot.docs.map(async (doc) => {
       const data = doc.data();
       // Parse the address to latitude and longitude
       const latLng = await this.parseAddressToLatLng(data.Address);
       if (latLng) {
-        this.setState({ heatmapData: [...this.state.heatmapData, latLng],
-        reportData: [...this.state.reportData, {data: data, coords: latLng}] });
+        this.setState({
+          heatmapData: [...this.state.heatmapData, { coordinate: latLng, category: data.Category }],
+          reportData: [...this.state.reportData, { data: data, coords: latLng }]
+        });
       }
     });
-
   }
+
 
   handleRegionChange = (region) => {
-
     if (region.longitudeDelta > 2.1)
-      this.setState({outOfZoom: true})
+      this.setState({ outOfZoom: true })
     else if (this.state.outOfZoom)
-      this.setState({outOfZoom: false})
-
+      this.setState({ outOfZoom: false })
   }
+
 
   exit = () => {
     this.props.navigation.navigate("HomeScreen");
   }
+
+
   report = () => {
     this.setState({ isMenuVisible: !this.state.isMenuVisible });
     this.props.navigation.navigate("Report");
   }
+
+
   toggleMenuPage = () => {
     this.setState({ isMenuVisible: !this.state.isMenuVisible });
     console.log(this.state.heatmapData)
   }
+
+
   toggleKeyPage = () => {
     this.setState({ isKeyPageVisible: !this.state.isKeyPageVisible });
   }
+
+
   render() {
     if (this.state.location === null) {
       return (
         <SafeAreaView style={styles.login}>
-          <ActivityIndicator  size={40}/>
+          <ActivityIndicator size={40} />
         </SafeAreaView>
       );
     }
 
+
     return (
       <SafeAreaView style={styles.login}>
-         
         <MapView
           provider={PROVIDER_GOOGLE}
-          style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center'}}
+          style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' }}
           initialRegion={{
             latitude: this.state.location.coords.latitude,
             longitude: this.state.location.coords.longitude,
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           }}
-          onRegionChange={this.handleRegionChange} // Add this event handler
+          onRegionChange={this.handleRegionChange}
         >
-          
-          
-          {
-            !this.state.outOfZoom ? this.state.reportData.map((data, key) => (
-              <Marker 
+          {!this.state.outOfZoom ? this.state.reportData.map((data, key) => (
+            <Marker
               key={key}
-              coordinate={{latitude: data.coords.latitude, longitude: data.coords.longitude}}
-              
-              onPress={() => {this.setState({info: [data.data.Address, data.data.Email, data.data.Description], infoVisible: true} )}}
-              ></Marker>
-            ) 
-            ) : null 
-          }
-          {
+              coordinate={data.coords}
+              onPress={() => { this.setState({ info: [data.data.Address, data.data.Email, data.data.Description], infoVisible: true }) }}
+            />
+          )) : null}
 
-            !this.state.outOfZoom ?
-                <Heatmap
-                  points={this.state.heatmapData}
-                  radius={this.state.heatmapRadius} // Adjust the radius
-                  opacity={0.7}
-                  gradient={{
-                    colors: ['blue', 'green', 'yellow', 'red'],
-                    startPoints: [0.25, 0.5, 0.75, 1],
-                    colorMapSize: 300,
-                  }}
-                  
-                /> : null
-          }
+
+          {!this.state.outOfZoom ? this.state.heatmapData.map((data, key) => (
+            <Heatmap
+              key={key}
+              points={[data.coordinate]}
+              opacity={0.7}
+              radius={this.state.heatmapRadius}
+              gradient={data.category === 'racism' ? { colors: ['blue', 'green', 'yellow', 'red'], startPoints: [0.25, 0.5, 0.75, 1], colorMapSize: 300 } :
+                data.category === 'assault' ? { colors: ['red', 'yellow', 'blue'], startPoints: [0.25, 0.5, 1], colorMapSize: 300 } :
+                  data.category === 'sexism' ? { colors: ['pink', 'purple'], startPoints: [0.5, 1], colorMapSize: 300 } :
+                    data.category === 'bullying' ? { colors: ['orange', 'red'], startPoints: [0.5, 1], colorMapSize: 300 } :
+                      data.category === 'other' ? { colors: ['gray', 'white'], startPoints: [0.5, 1], colorMapSize: 300 } : null}
+            />
+          )) : null}
         </MapView>
 
+
         {this.state.infoVisible ?
-              <View style={styles.rect}>
-                <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                    
-                    <View style = {{flexDirection: 'column', marginTop: 10, left: 12}}>
-                      <Text style= {styles.address}>{this.state.info[0]}</Text>
-                      <Text style={styles.email} >{this.state.info[1]}</Text>
-                    </View>
-                    
-                    <TouchableOpacity onPress={() => {this.setState({infoVisible: false})}}><Icon name={'close'} color={'white'} size={33} style={{ right: 3, bottom: 3}} /></TouchableOpacity>
-                </View>
-                  <View style={styles.line}></View>
-                  <Text style={styles.desc} >{this.state.info[2]}</Text>
-                
-                
-             </View> 
-             
-             : null
+          <View style={styles.rect}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'column', marginTop: 10, left: 12 }}>
+                <Text style={styles.address}>{this.state.info[0]}</Text>
+                <Text style={styles.email} >{this.state.info[1]}</Text>
+              </View>
+              <TouchableOpacity onPress={() => { this.setState({ infoVisible: false }) }}><Icon name={'close'} color={'white'} size={33} style={{ right: 3, bottom: 3 }} /></TouchableOpacity>
+            </View>
+            <View style={styles.line}></View>
+            <Text style={styles.desc} >{this.state.info[2]}</Text>
+          </View> : null
+        }
 
-          }
 
-        
         <TouchableOpacity style={styles.keyButton} onPress={this.toggleMenuPage}>
           <Entypo size={38} name='menu' />
         </TouchableOpacity>
-        
+
+
         <Modal transparent={true} animationType="slide" visible={this.state.isMenuVisible}>
           <View style={styles.keyPage}>
-          <TouchableOpacity
+            <TouchableOpacity
               style={styles.closeMenuButton}
               onPress={this.toggleKeyPage}
             >
               <Text style={styles.buttonText}>Key</Text>
             </TouchableOpacity>
+
 
             <Modal
               transparent={true}
@@ -186,7 +189,6 @@ export default class HeatMap extends Component {
                 <Text style={styles.normalText}>Sexism: Color3</Text>
                 <Text style={styles.normalText}>Bullying: Color4</Text>
                 <Text style={styles.normalText}>Extraneous: Color5</Text>
-
                 <TouchableOpacity
                   style={styles.closeKeyButton}
                   onPress={this.toggleKeyPage}
@@ -194,7 +196,8 @@ export default class HeatMap extends Component {
                   <Text style={styles.buttonText}>Close</Text>
                 </TouchableOpacity>
               </View>
-            </Modal>  
+            </Modal>
+
 
             <TouchableOpacity
               style={styles.closeMenuButton}
@@ -203,12 +206,14 @@ export default class HeatMap extends Component {
               <Text style={styles.buttonText}>Report</Text>
             </TouchableOpacity>
 
+
             <TouchableOpacity
               style={styles.closeMenuButton}
               onPress={this.exit}
             >
               <Text style={styles.buttonText}>Return to Home</Text>
             </TouchableOpacity>
+
 
             <TouchableOpacity
               style={styles.closeMenuButton}
@@ -218,11 +223,13 @@ export default class HeatMap extends Component {
             </TouchableOpacity>
           </View>
         </Modal>
-       
       </SafeAreaView>
     );
   }
 }
+
+
+
 
 const styles = StyleSheet.create({
   closeMenuButton: {
@@ -247,6 +254,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white'
 
+
   },
   email: {
     fontSize: 19,
@@ -254,11 +262,13 @@ const styles = StyleSheet.create({
     left: 4,
     top: 2
 
+
   },
   desc: {
     fontSize: 16,
     padding: 15,
     color: 'white'
+
 
   },
   rect: {
@@ -280,12 +290,16 @@ const styles = StyleSheet.create({
   },
 
 
+
+
   keyPage: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
+
+
 
 
   keyPageText: {
@@ -302,6 +316,8 @@ const styles = StyleSheet.create({
   },
 
 
+
+
   closeKeyButton: {
     backgroundColor: "#08C91C",
     borderRadius: 25,
@@ -316,6 +332,8 @@ const styles = StyleSheet.create({
   },
 
 
+
+
   loginText: {
     fontSize: 17,
     fontWeight: 'bold'
@@ -326,11 +344,17 @@ const styles = StyleSheet.create({
   },
 
 
+
+
   login: {
     flex: 1,
     backgroundColor: "#74CAEF",
     justifyContent: 'space-evenly'
   },
+
+
+
+
 
 
 
@@ -343,6 +367,10 @@ const styles = StyleSheet.create({
 
 
 
+
+
+
+
   t: {
     fontSize: 15,
     fontWeight: '600',
@@ -351,6 +379,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'pink',
     marginHorizontal: 20,
   },
+
+
+
+
 
 
 
@@ -381,6 +413,8 @@ const styles = StyleSheet.create({
   },
 
 
+
+
   button: {
     width: "80%",
     borderRadius: 25,
@@ -403,6 +437,8 @@ const styles = StyleSheet.create({
   },
 
 
+
+
   inputView: {
     backgroundColor: "#2FAED7",
     borderRadius: 9,
@@ -410,6 +446,8 @@ const styles = StyleSheet.create({
     height: 45,
     marginBottom: 25,
   },
+
+
 
 
   loginBtn: {
@@ -421,6 +459,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#08C91C",
   },
 });
+
+
+
+
 
 
 
