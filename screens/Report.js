@@ -15,16 +15,14 @@ import {
 
 import { collection, addDoc } from 'firebase/firestore';
 import FirebaseInfo from '../FirebaseHandler';
-import { OPEN_AI_API_KEY } from '../secrets';
-
+import {OPEN_AI_API_KEY} from '@env'
 
 export default class HomeScreen extends Component {
     constructor(props) {
         super(props);
 
-
-        this.apiKey = OPEN_AI_API_KEY;
-
+        this.apiKey = OPEN_AI_API_KEY
+        
 
         this.state = {
             Address: '',
@@ -37,7 +35,7 @@ export default class HomeScreen extends Component {
 
     grouping = async (description) => {
         try {
-            let b = "Classify the following sentence into either racism, sexism, assault, or other: " + this.state.Description + ". Return the data as a JSON string with a key called category indicating the classified category and a key called intesity which is a value between zero and one indicating your confidence in this classification.";
+            let b = "Classify the following sentence into either 'racism', 'sexism', 'assault', or 'other' (if the other categories don't fit): " + this.state.Description + ". Return the data as a JSON string with a key called category indicating the classified category and a key called intesity which is a value between 1 and 100 indicating how serious and dangerous the incident is.";
             const res = await fetch("https://api.openai.com/v1/completions", {
                 method: 'POST',
                 headers: {
@@ -53,16 +51,13 @@ export default class HomeScreen extends Component {
                 }),
             });
             const json = await res.json();
-            console.log(json.choices[0].text);
             const values = JSON.parse(json.choices[0].text);
-            console.log(values.category);
-            console.log(values.intensity);
-            console.log(b);
             return {
                 category: values.category,
                 intensity: values.intensity
             };
         } catch (error) {
+
             console.error("Error in grouping function:", error);
             throw error; // Rethrow the error to propagate it further if needed
         }
@@ -96,7 +91,7 @@ export default class HomeScreen extends Component {
 
 
     cancel = () => {
-        this.props.navigation.navigate("HomeScreen");
+        this.props.navigation.navigate("HomeScreen")
     }
 
 
