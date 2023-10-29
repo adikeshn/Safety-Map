@@ -41,30 +41,13 @@ export default class HeatMap extends Component {
     return { latitude: a[0].latitude, longitude: a[0].longitude };
   }
 
-  
-  async componentDidMount() {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
+  async loadData() {
+    await getDocs(collection(FirebaseInfo.db, 'Reports2')).then(async (data) => {
 
-
-      let location = await Location.getCurrentPositionAsync({});
-      this.setState({ location });
-    })();
-
-
-    // Listen for changes in Firestore data
-    await getDocs(collection(FirebaseInfo.db, 'Reports2')).then((data) => {
-
-      data.docs.map(async (doc) => {
+      await Promise.all(data.docs.map(async (doc) => {
         const data = doc.data();
-        console.log(data)
         // Parse the address to latitude and longitude
         const latLng = await this.parseAddressToLatLng(data.Address);
-        console.log(latLng)
 
         if (latLng) {
           this.setState({
@@ -77,9 +60,25 @@ export default class HeatMap extends Component {
             reportData: this.state.reportDataFull
           })
         }
-      })
+      }))
+      
 
     })
+  }
+  async componentDidMount() {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
+      await this.loadData()
+      let location = await Location.getCurrentPositionAsync({});
+      this.setState({ location });
+    })();
+
+
+    // Listen for changes in Firestore data
     
   }
 
