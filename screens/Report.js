@@ -33,7 +33,7 @@ export default class HomeScreen extends Component {
 
 
 
-    grouping = async (description) => {
+    /*grouping = async (description) => {
         try {
             let b = "Classify the following sentence into either 'racism', 'sexism', 'assault', or 'other' (if the other categories don't fit): " + this.state.Description + ". Return the data as a JSON string with a key called category indicating the classified category and a key called intesity which is a value between 1 and 100 indicating how serious and dangerous the incident is.";
             const res = await fetch("https://api.openai.com/v1/completions", {
@@ -61,22 +61,21 @@ export default class HomeScreen extends Component {
             console.error("Error in grouping function:", error);
             throw error; // Rethrow the error to propagate it further if needed
         }
-    }
+    }*/
 
 
 
 
     submit = async () => {
         try {
-            let group = await this.grouping(this.state.Description);
 
 
             await addDoc(collection(FirebaseInfo.db, "Reports2"), {
                 Address: this.state.Address,
                 Description: this.state.Description,
                 Email: global.user,
-                Category: group.category,
-                Intensity: group.intensity
+                Category: "assault",
+                Intensity: 50
             });
 
 
